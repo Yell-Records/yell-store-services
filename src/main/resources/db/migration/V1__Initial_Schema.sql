@@ -74,7 +74,7 @@ CREATE TABLE orders (
     shipped_at TIMESTAMP WITH TIME ZONE,
 
     CONSTRAINT orders_pk PRIMARY KEY (id),
-    CONSTRAINT orders_buyer_email_regex_check CHECK (buyer_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+    CONSTRAINT orders_buyer_email_regex_check CHECK (${emailCheck}),
     CONSTRAINT orders_status_check CHECK (status IN ('IN_PROGRESS', 'SHIPPED', 'FULFILLED', 'CANCELED')),
     CONSTRAINT orders_total_paid_check CHECK (total_paid > 0),
     CONSTRAINT orders_shipping_phone_check CHECK (shipping_phone ~ '^[0-9\-\(\) ]{7,20}$')

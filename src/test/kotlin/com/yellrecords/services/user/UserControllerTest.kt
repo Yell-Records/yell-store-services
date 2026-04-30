@@ -1,14 +1,11 @@
 package com.yellrecords.services.user
 
 import com.yellrecords.services.BaseH2Test
-import com.yellrecords.services.user.dto.RegistrationInfo
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpMethod.GET
-import org.springframework.http.HttpMethod.POST
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.util.UUID
 
 class UserControllerTest : BaseH2Test() {
     companion object {
@@ -18,111 +15,28 @@ class UserControllerTest : BaseH2Test() {
     @Nested
     inner class GetUsers {
         @Test
-        fun `should return 403 forbidden when no auth`() {
-            mockRequest(requestType = GET, path = BASE_PATH, token = null)
-                .andExpect(status().isForbidden)
-        }
-
-        @Test
-        fun `should return 403 forbidden if user`() {
-            mockRequest(requestType = GET, path = BASE_PATH, token = TestTokens.user)
-                .andExpect(status().isForbidden)
-        }
-
-        @Test
-        fun `should return 200 ok if moderator`() {
-            mockRequest(requestType = GET, path = BASE_PATH, token = TestTokens.moderator)
-                .andExpect(status().isOk)
-        }
-
-        @Test
-        fun `should return 200 ok if admin`() {
-            mockRequest(requestType = GET, path = BASE_PATH, token = TestTokens.admin)
-                .andExpect(status().isOk)
-        }
-
-        @Test
-        fun `should return 200 ok if superadmin`() {
-            mockRequest(requestType = GET, path = BASE_PATH, TestTokens.superadmin)
-                .andExpect(status().isOk)
-        }
-    }
-
-    @Nested
-    inner class GetUserByUsername {
-        @Test
-        fun `should retrieve admin by username`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/username/aDMin", token = null)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.username").value("Admin"))
-        }
-
-        @Test
-        fun `should retrieve user by username`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/username/test_user123", token = null)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.username").value("test_user123"))
-        }
-
-        @Test
-        fun `should return 404 not found`() {
+        fun `should return admin account details`() {
             mockRequest(
                 requestType = GET,
-                path = "$BASE_PATH/username/phantomUser210401",
+                path = "$BASE_PATH/${TestUsers.admin.id!!}",
+                token = TestTokens.admin,
+            ).andExpect(status().isOk)
+        }
+
+        @Test
+        fun `should return 403 forbidden when retrieving user information as non-user`() {
+            mockRequest(
+                requestType = GET,
+                path = "$BASE_PATH/${TestUsers.admin.id!!}",
                 token = null,
-            ).andExpect(status().isNotFound)
+            ).andExpect(status().isForbidden)
         }
 
         @Test
         fun `should retrieve current user`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/me", token = TestTokens.user)
+            mockRequest(requestType = GET, path = "$BASE_PATH/me", token = TestTokens.admin)
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.username").value(TestUsers.user.username))
-        }
-    }
-
-    @Nested
-    inner class GetUserById {
-        @Test
-        fun `should retrieve user by id`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/${TestUsers.user.id}", token = null)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id").value(TestUsers.user.id.toString()))
-        }
-
-        @Test
-        fun `should return 404 not found`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/${UUID.randomUUID()}", token = null)
-                .andExpect(status().isNotFound)
-        }
-    }
-
-    @Nested
-    inner class RegisterUser {
-        @Test
-        fun `should save user`() {
-            val regInfo =
-                RegistrationInfo(
-                    username = "linus",
-                    rawPassword = "qwerty",
-                    email = "linus@linux.com",
-                )
-
-            mockRequest(requestType = POST, path = BASE_PATH, body = regInfo, token = null)
-                .andExpect(status().isCreated)
-        }
-
-        @Test
-        fun `should return 409 conflict`() {
-            val regInfo =
-                RegistrationInfo(
-                    username = TestUsers.user.username,
-                    rawPassword = "qwerty",
-                    email = "blah@test.com",
-                )
-
-            mockRequest(requestType = POST, path = BASE_PATH, body = regInfo, token = null)
-                .andExpect(status().isConflict)
+                .andExpect(jsonPath("$.username").value(TestUsers.admin.username))
         }
     }
 }

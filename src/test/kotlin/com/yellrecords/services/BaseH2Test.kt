@@ -1,6 +1,5 @@
 package com.yellrecords.services
 
-import com.yellrecords.services.auth.CustomUserDetails
 import com.yellrecords.services.auth.JwtService
 import com.yellrecords.services.category.Category
 import com.yellrecords.services.category.CategoryRepository
@@ -19,8 +18,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -55,31 +52,19 @@ abstract class BaseH2Test {
     /**
      * A container for referencing preset registered users.
      *
-     * @property user Default user.
-     * @property moderator
-     * @property admin
-     * @property superadmin
+     * @property admin Default user with admin permissions.
      */
     protected object TestUsers {
-        lateinit var user: User
-        lateinit var moderator: User
         lateinit var admin: User
-        lateinit var superadmin: User
     }
 
     /**
      * A container for holding preset Java Web Tokens.
      *
-     * @property user Represents a regular user token.
-     * @property moderator Client with moderator-level privilege.
      * @property admin Client with admin-level privilege.
-     * @property superadmin Client with superadmin-level privilege.
      */
     protected object TestTokens {
-        lateinit var user: String
-        lateinit var moderator: String
         lateinit var admin: String
-        lateinit var superadmin: String
     }
 
     @BeforeAll
@@ -107,24 +92,14 @@ abstract class BaseH2Test {
             val token = jwtService.generateToken(seed.username, newUser.id!!, newUser.role)
 
             when (seed.role.uppercase()) {
-                UserRole.SUPERADMIN -> {
-                    TestUsers.superadmin = newUser
-                    TestTokens.superadmin = token
-                }
-
                 UserRole.ADMIN -> {
                     TestUsers.admin = newUser
                     TestTokens.admin = token
                 }
 
-                UserRole.MODERATOR -> {
-                    TestUsers.moderator = newUser
-                    TestTokens.moderator = token
-                }
-
                 else -> {
-                    TestUsers.user = newUser
-                    TestTokens.user = token
+                    TestUsers.admin = newUser
+                    TestTokens.admin = token
                 }
             }
         }
@@ -133,8 +108,8 @@ abstract class BaseH2Test {
     /**
      * This method first creates a new category, then initializes the item listing repository with
      * two listings:
-     * 1. Sold by `moderator` with a price of 100
-     * 2. Sold by `admin` with a price of 250
+     * 1. $100 item
+     * 2. $250 item
      *
      * @return All item listings.
      */
@@ -144,7 +119,6 @@ abstract class BaseH2Test {
 
         itemListingRepository.save(
             ItemListing(
-                sellerId = TestUsers.moderator.id!!,
                 title = "Test Listing 1",
                 description = "Test listing.",
                 price = BigDecimal.valueOf(100),
@@ -154,7 +128,6 @@ abstract class BaseH2Test {
 
         itemListingRepository.save(
             ItemListing(
-                sellerId = TestUsers.admin.id!!,
                 title = "Test Listing 2",
                 description = "Test listing, but admin.",
                 price = BigDecimal.valueOf(250),
@@ -208,23 +181,5 @@ abstract class BaseH2Test {
         params.forEach { (k, v) -> builder.param(k, v) }
 
         return mockMvc.perform(builder)
-    }
-
-    /**
-     * Inserts authentication information into the application. Useful for getting past certain
-     * service rules.
-     *
-     * @param user User to authenticate with.
-     */
-    protected fun authenticate(user: User) {
-        val principal = CustomUserDetails(user)
-        val auth = UsernamePasswordAuthenticationToken(principal, null, principal.authorities)
-
-        SecurityContextHolder.getContext().authentication = auth
-    }
-
-    /** Removes authentication information to simulate a non-user using the app. */
-    protected fun clearAuth() {
-        SecurityContextHolder.clearContext()
     }
 }

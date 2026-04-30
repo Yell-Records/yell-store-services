@@ -14,8 +14,7 @@ class AuthControllerTest : BaseH2Test() {
 
     @Test
     fun `should login user`() {
-        val loginReq =
-            LoginRequest(username = TestUsers.user.username, rawPassword = "IloveToTravel!")
+        val loginReq = LoginRequest(username = TestUsers.admin.username, rawPassword = "admin")
 
         mockRequest(POST, LOGIN, body = loginReq, token = null).andExpect(status().isOk)
     }
@@ -29,7 +28,7 @@ class AuthControllerTest : BaseH2Test() {
 
     @Test
     fun `invalid password should return 400 bad request`() {
-        val loginReq = LoginRequest(username = TestUsers.user.username, rawPassword = "1234561427")
+        val loginReq = LoginRequest(username = TestUsers.admin.username, rawPassword = "1234561427")
 
         mockRequest(POST, LOGIN, body = loginReq, token = null).andExpect(status().isBadRequest)
     }

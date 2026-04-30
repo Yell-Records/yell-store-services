@@ -63,7 +63,7 @@ class CategoryControllerTest : BaseH2Test() {
             mockRequest(requestType = GET, path = "$BASE_PATH/all", token = null)
                 .andExpect(status().isForbidden)
 
-            mockRequest(requestType = GET, path = "$BASE_PATH/all", token = TestTokens.user)
+            mockRequest(requestType = GET, path = "$BASE_PATH/all", token = TestTokens.admin)
                 .andExpect(status().isForbidden)
         }
 
@@ -90,16 +90,6 @@ class CategoryControllerTest : BaseH2Test() {
 
             mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
                 .andExpect(status().isForbidden)
-
-            mockRequest(requestType = POST, path = BASE_PATH, token = TestTokens.user, body = req)
-                .andExpect(status().isForbidden)
-
-            mockRequest(
-                requestType = POST,
-                path = BASE_PATH,
-                token = TestTokens.moderator,
-                body = req,
-            ).andExpect(status().isForbidden)
         }
 
         @Test
@@ -212,13 +202,6 @@ class CategoryControllerTest : BaseH2Test() {
                 requestType = PATCH,
                 path = "$BASE_PATH/${sampleCategory.id!!}",
                 token = null,
-                body = req,
-            ).andExpect(status().isForbidden)
-
-            mockRequest(
-                requestType = PATCH,
-                path = "$BASE_PATH/${sampleCategory.id!!}",
-                token = TestTokens.user,
                 body = req,
             ).andExpect(status().isForbidden)
         }

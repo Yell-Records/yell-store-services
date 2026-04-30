@@ -3,6 +3,7 @@ package com.yellrecords.services.user
 import com.yellrecords.services.auth.CustomUserDetails
 import com.yellrecords.services.user.dto.RegistrationInfo
 import com.yellrecords.services.user.dto.UserDto
+import jakarta.annotation.security.RolesAllowed
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -20,6 +21,7 @@ class UserController(
     private val service: UserService,
 ) {
     @GetMapping("/{id}")
+    @RolesAllowed(UserRole.ADMIN)
     fun getUserById(
         @PathVariable id: UUID,
     ): UserDto = service.getUserById(id)

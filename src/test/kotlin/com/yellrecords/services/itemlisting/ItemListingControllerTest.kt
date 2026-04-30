@@ -2,6 +2,7 @@ package com.yellrecords.services.itemlisting
 
 import com.yellrecords.services.BaseH2Test
 import com.yellrecords.services.category.Category
+import com.yellrecords.services.itemlisting.dto.CreateListingRequest
 import com.yellrecords.services.itemlisting.dto.ItemListingDto
 import com.yellrecords.services.itemlisting.dto.UpdateListingRequest
 import io.kotest.inspectors.forAll
@@ -19,7 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
 import java.util.UUID
-import kotlin.jvm.optionals.getOrNull
 
 class ItemListingControllerTest : BaseH2Test() {
     companion object {
@@ -40,73 +40,43 @@ class ItemListingControllerTest : BaseH2Test() {
     inner class CreateItemListing {
         @Test
         fun `item listing created by non-user should return 403 forbidden`() {
-            val listing =
-                ItemListingDto(
-                    id = null,
-                    title = "Bad Listing",
-                    description = "Bad listing.",
-                    price = BigDecimal.valueOf(5000),
+            val category =
+                categoryRepository.findCategoryBySlug("sample-category").shouldNotBeNull()
+
+            val req =
+                CreateListingRequest(
+                    title = "Test",
+                    description = "Test",
                     imageUrl = null,
-                    sellerId = UUID.randomUUID(), // How exactly is the guest user setting this?
-                    sellerUsername = "UNKNOWN",
-                    categorySlug = "uncategorized",
-                    categoryName = "Uncategorized",
+                    price = BigDecimal("10.00"),
+                    categorySlug = category.slug,
                 )
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = listing)
+            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
                 .andExpect(status().isForbidden)
         }
 
         @Test
-        fun `create item listing should be ok`() {
-            itemListingRepository.deleteAll()
+        fun `should create item listing`() {
+            val category =
+                categoryRepository.findCategoryBySlug("sample-category").shouldNotBeNull()
 
-            val listing =
-                ItemListingDto(
-                    id = null,
-                    title = "Good listing",
-                    description = "Good listing.",
-                    price = BigDecimal.valueOf(1),
+            val req =
+                CreateListingRequest(
+                    title = "Test 2",
+                    description = "Test",
                     imageUrl = null,
-                    sellerId = TestUsers.user.id!!,
-                    sellerUsername = TestUsers.user.username,
-                    categorySlug = "uncategorized",
-                    categoryName = "Uncategorized",
+                    price = BigDecimal("10.00"),
+                    categorySlug = category.slug,
                 )
 
-            mockRequest(
-                requestType = POST,
-                path = BASE_PATH,
-                token = TestTokens.user,
-                body = listing,
-            ).andExpect(status().isCreated)
-
-            val userItems = itemListingRepository.findItemListingsBySellerId(TestUsers.user.id!!)
-            userItems.size shouldBe 1
+            mockRequest(requestType = POST, path = BASE_PATH, token = TestTokens.admin, body = req)
+                .andExpect(status().isCreated)
         }
     }
 
     @Nested
     inner class GetItemListing {
-        @Test
-        fun `should get items by user id`() {
-            mockRequest(
-                requestType = GET,
-                path = "$BASE_PATH/seller/${TestUsers.moderator.id}",
-                token = null,
-            ).andExpect(status().isOk)
-                .andExpect(jsonPath("$[0].sellerUsername").value(TestUsers.moderator.username))
-        }
-
-        @Test
-        fun `should return 404 not found on non-existing user`() {
-            mockRequest(
-                requestType = GET,
-                path = "$BASE_PATH/seller/${UUID.randomUUID()}",
-                token = null,
-            ).andExpect(status().isNotFound)
-        }
-
         @Test
         fun `should get all item listings`() {
             mockRequest(requestType = GET, path = BASE_PATH, token = null)
@@ -145,7 +115,6 @@ class ItemListingControllerTest : BaseH2Test() {
                 otherListing =
                     itemListingRepository.save(
                         ItemListing(
-                            sellerId = TestUsers.admin.id!!,
                             title = "New Listing",
                             description = "New listing.",
                             price = BigDecimal.valueOf(5000),
@@ -203,12 +172,12 @@ class ItemListingControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${listing1.id}",
-                token = TestTokens.moderator,
+                token = TestTokens.admin,
                 body = req,
             ).andExpect(status().isOk)
 
-            val listing =
-                itemListingRepository.findById(listing1.id!!).getOrNull().shouldNotBeNull()
+            val listing = itemListingRepository.findById(listing1.id!!).get()
+
             listing.title shouldBe req.title
             listing.description shouldBe req.description
             listing.price shouldBe req.price
@@ -230,7 +199,7 @@ class ItemListingControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${listing1.id}",
-                token = TestTokens.moderator,
+                token = TestTokens.admin,
                 body = UpdateListingRequest(price = BigDecimal(-1)),
             ).andExpect(status().isBadRequest)
         }
