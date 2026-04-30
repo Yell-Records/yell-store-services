@@ -1,6 +1,6 @@
 spring:
   application:
-    name: quantum-mart-services
+    name: yell-store-services
 
   config:
     activate:
@@ -33,7 +33,7 @@ app:
   public-url: ${PUBLIC_URL:http://localhost:8080}
 
 jwt:
-  secret: 1d2i0jf0923thg91wd1uegh03hth13irh9fj31h12rh129
+  secret: ${JWT_SECRET}
 
 logging:
   level:

@@ -7,11 +7,11 @@ plugins {
     id("com.diffplug.spotless") version "8.4.0"
 }
 
-group = "com.mattrition"
+group = "com.yellrecords"
 
 version = findProperty("version")?.toString() ?: "0.0.1-SNAPSHOT"
 
-description = "Spring Boot project for QuantumMart"
+description = "Spring Boot project for the Yell Records store"
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(22) } }
 
