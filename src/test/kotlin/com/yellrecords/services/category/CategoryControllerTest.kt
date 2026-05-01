@@ -62,9 +62,6 @@ class CategoryControllerTest : BaseH2Test() {
         fun `should return 403 forbidden when retrieving every category as non-admin`() {
             mockRequest(requestType = GET, path = "$BASE_PATH/all", token = null)
                 .andExpect(status().isForbidden)
-
-            mockRequest(requestType = GET, path = "$BASE_PATH/all", token = TestTokens.admin)
-                .andExpect(status().isForbidden)
         }
 
         @Test

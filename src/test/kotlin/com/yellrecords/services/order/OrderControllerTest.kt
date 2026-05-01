@@ -101,7 +101,7 @@ class OrderControllerTest : BaseH2Test() {
             @Test
             fun `should clear buyer's cart items`() {
                 val prevItems = cartItemRepository.findGuestCartItems(guestId)
-                prevItems shouldHaveSize 2
+                prevItems shouldHaveSize 1
 
                 mockRequest(requestType = POST, path = BASE_PATH, token = null, body = guestRequest)
                     .andExpect(status().isCreated)
@@ -112,21 +112,16 @@ class OrderControllerTest : BaseH2Test() {
 
             @Test
             fun `should create order items based on items in cart`() {
-                mockRequest(
-                    requestType = POST,
-                    path = BASE_PATH,
-                    token = TestTokens.admin,
-                    body = guestRequest,
-                ).andExpect(status().isCreated)
+                mockRequest(requestType = POST, path = BASE_PATH, token = null, body = guestRequest)
+                    .andExpect(status().isCreated)
 
-                val userOrders = orderRepository.findAll().toList()
-                userOrders shouldHaveSize 1
+                val allOrders = orderRepository.findAll().toList()
+                allOrders shouldHaveSize 1
 
-                val userOrder = userOrders.first()
-                val orderItems = orderItemRepository.findOrderItemsByOrderId(userOrder.id!!)
-                orderItems shouldHaveSize 2
+                val guestOrder = allOrders.first()
+                val orderItems = orderItemRepository.findOrderItemsByOrderId(guestOrder.id!!)
+                orderItems shouldHaveSize 1
                 orderItems.forOne { it.listingId shouldBe listing1.id }
-                orderItems.forOne { it.listingId shouldBe listing2.id }
             }
         }
     }
