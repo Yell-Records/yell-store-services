@@ -30,7 +30,7 @@ Standalone entities meant for group identifiers on item listings.
 
 ## ⏱️Lifecycle
 ### ➕Row Creation
-System admins and up can create a new category.
+System admins can create a new category.
 
 By default, a single category named "Uncategorized" is created to allow existing item listings 
 to stay relevant.
