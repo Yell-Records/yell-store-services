@@ -2,7 +2,6 @@ package com.yellrecords.services.cart
 
 import com.yellrecords.services.BaseH2Test
 import com.yellrecords.services.cart.dto.AddCartItemDto
-import com.yellrecords.services.itemlisting.ItemListing
 import com.yellrecords.services.itemlisting.dto.ItemListingDto
 import com.yellrecords.services.itemlisting.dto.ItemListingMapper
 import io.kotest.inspectors.forNone
@@ -29,13 +28,8 @@ class CartItemControllerTest : BaseH2Test() {
 
     @Autowired lateinit var cartItemRepository: CartItemRepository
 
-    private lateinit var listing1: ItemListing
     private lateinit var listing1Dto: ItemListingDto
-    private lateinit var listing2: ItemListing
     private lateinit var listing2Dto: ItemListingDto
-
-    private lateinit var cartItem1: CartItem
-    private lateinit var cartItem2: CartItem
 
     private val guestId = UUID.randomUUID()
 
@@ -44,17 +38,12 @@ class CartItemControllerTest : BaseH2Test() {
     @BeforeEach
     fun addCartItems() {
         val listings = super.initListings()
-        listing1 = listings.last()
+        val listing1 = listings.last()
+
         listing1Dto = ItemListingMapper.toDto(listing1, listing1.category()!!)
 
-        listing2 = listings.first()
+        val listing2 = listings.first()
         listing2Dto = ItemListingMapper.toDto(listing2, listing2.category()!!)
-
-        val item1 = CartItem(guestSessionId = guestId, listingId = listing1.id!!, quantity = 1)
-        val item2 = CartItem(guestSessionId = guestId, listingId = listing2.id!!, quantity = 1)
-
-        cartItem1 = cartItemRepository.save(item1)
-        cartItem2 = cartItemRepository.save(item2)
 
         val guestItem = CartItem(guestSessionId = guestId, listingId = listing1.id!!, quantity = 1)
 
