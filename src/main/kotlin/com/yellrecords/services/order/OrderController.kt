@@ -1,0 +1,35 @@
+package com.yellrecords.services.order
+
+import com.yellrecords.services.order.dto.CreateOrderRequestDto
+import com.yellrecords.services.order.dto.OrderDto
+import com.yellrecords.services.user.UserRole
+import jakarta.annotation.security.RolesAllowed
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/api/orders")
+class OrderController(
+    private val orderService: OrderService,
+) {
+    @GetMapping
+    @RolesAllowed(UserRole.ADMIN)
+    fun getRelevantOrdersToSeller(
+        @RequestParam(required = true) unfinished: Boolean,
+    ): List<OrderDto> = orderService.getOrdersForSeller(unfinished)
+
+    @PostMapping
+    fun createOrder(
+        @RequestBody orderReq: CreateOrderRequestDto,
+    ): ResponseEntity<OrderDto> {
+        val orderWithItems = orderService.createOrder(orderReq)
+
+        return ResponseEntity(orderWithItems, HttpStatus.CREATED)
+    }
+}

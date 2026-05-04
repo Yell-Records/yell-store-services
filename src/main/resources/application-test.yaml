@@ -12,13 +12,11 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
   flyway:
     enabled: true
+    placeholders:
+      emailCheck: "1=1"
 
 app:
   public-url: http://test-url
 
 jwt:
   secret: qKbdSQ3bgLRZJWH29euWFYxG2PZrBCEgPQJWPOs0v1P
-
-jobs:
-  autoComplete:
-    cron: "0 0 10 * * *"
