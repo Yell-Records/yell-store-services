@@ -27,3 +27,6 @@ to administrator accounts.
 - [Get ALL categories](category/category-get-all.md): `GET /api/categories/all`
 - [Create new category](category/category-post.md): `POST /api/categories`
 - [Update category](category/category-patch-pk.md): `PATCH /api/categories/:id`
+
+### Images
+- [Upload image](images/image-post-upload.md): `POST /api/images/upload`
