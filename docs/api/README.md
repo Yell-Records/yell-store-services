@@ -5,7 +5,7 @@ A general overview of current REST endpoints the application uses.
 Open endpoints require no Authentication.
 
 ### Authentication
-Endpoints for login and endpoint authorization
+Endpoints for login and endpoint authorization.
 - [Login](auth/auth-post-login.md): `POST /api/auth/login`
 
 ### Cart Items
