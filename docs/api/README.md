@@ -19,6 +19,11 @@ Endpoints related to items within a client's cart.
 Endpoints for item listing categories.
 - [Get active categories](category/category-get.md): `GET /api/categories`
 
+### Item Listings
+Endpoints for products being sold.
+- [Get all item listings](item-listings/item-listings-get.md): `GET /api/item-listings`
+- [Get item listings under category](item-listings/item-listings-get-category.md): `GET /api/item-listings/category/:slug`
+
 ## Endpoints that require Authentication
 Closed endpoints require a valid Token to be included in the header request, which is usually only provided
 to administrator accounts.
@@ -30,3 +35,6 @@ to administrator accounts.
 
 ### Images
 - [Upload image](images/image-post-upload.md): `POST /api/images/upload`
+
+### Item Listings
+- [Create new item listing](item-listings/item-listings-post.md): `POST /api/item-listings`
