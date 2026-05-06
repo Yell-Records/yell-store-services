@@ -47,3 +47,9 @@ to administrator accounts.
 
 ### Orders
 - [Get orders organized by status](orders/orders-get.md): `GET /api/orders`
+
+### Users
+Endpoints mostly for administrators to manage website access.
+- [Get user by ID](users/users-get-id.md): `GET /api/users/:id`
+- [Get current user](users/users-get-me.md): `GET /api/users/me`
+- [Create new user](users/users-post.md): `POST /api/users`
