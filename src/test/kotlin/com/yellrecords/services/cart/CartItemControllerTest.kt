@@ -102,7 +102,7 @@ class CartItemControllerTest : BaseH2Test() {
             preItems shouldHaveAtLeastSize 1
 
             mockRequest(requestType = DELETE, path = "$BASE_PATH/guest/$guestId", token = null)
-                .andExpect(status().isOk)
+                .andExpect(status().isNoContent)
 
             val guestItems = cartItemRepository.findGuestCartItems(guestId)
             guestItems shouldHaveSize 0
@@ -129,7 +129,7 @@ class CartItemControllerTest : BaseH2Test() {
                 requestType = DELETE,
                 path = "$BASE_PATH/guest/$guestId/listing/${listing2Dto.id}",
                 token = null,
-            ).andExpect(status().isOk)
+            ).andExpect(status().isNoContent)
 
             val guestItems = cartItemRepository.findGuestCartItems(guestId)
             guestItems shouldHaveSize 1

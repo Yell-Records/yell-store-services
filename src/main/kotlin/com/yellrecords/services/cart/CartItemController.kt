@@ -2,6 +2,7 @@ package com.yellrecords.services.cart
 
 import com.yellrecords.services.cart.dto.AddCartItemDto
 import com.yellrecords.services.cart.dto.CartItemWithListingDto
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -29,11 +30,19 @@ class CartItemController(
     @DeleteMapping("/guest/{guestSessionId}")
     fun clearGuestCartItems(
         @PathVariable guestSessionId: UUID,
-    ) = cartService.deleteGuestCartItems(guestSessionId)
+    ): ResponseEntity<Void> {
+        cartService.deleteGuestCartItems(guestSessionId)
+
+        return ResponseEntity.noContent().build()
+    }
 
     @DeleteMapping("/guest/{guestSessionId}/listing/{listingId}")
     fun deleteCartItemFromGuest(
         @PathVariable guestSessionId: UUID,
         @PathVariable listingId: UUID,
-    ) = cartService.deleteGuestCartItem(guestSessionId, listingId)
+    ): ResponseEntity<Void> {
+        cartService.deleteGuestCartItem(guestSessionId, listingId)
+
+        return ResponseEntity.noContent().build()
+    }
 }
