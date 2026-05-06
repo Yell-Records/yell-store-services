@@ -17,7 +17,7 @@ Endpoints related to items within a client's cart.
 
 ### Categories
 Endpoints for item listing categories.
-- [Get active categories](category/category-get.md): `GET /api/categories`
+- [Get active categories](categories/category-get.md): `GET /api/categories`
 
 ### Item Listings
 Endpoints for products being sold.
@@ -25,14 +25,18 @@ Endpoints for products being sold.
 - [Get item listing by ID](item-listings/item-listings-get-id.md): `GET /api/item-listings/:id`
 - [Get item listings under category](item-listings/item-listings-get-category.md): `GET /api/item-listings/category/:slug`
 
+### Orders
+Endpoints for purchase orders
+- [Create / place order](orders/orders-post.md): `POST /api/orders`
+
 ## Endpoints that require Authentication
 Closed endpoints require a valid Token to be included in the header request, which is usually only provided
 to administrator accounts.
 
 ### Categories
-- [Get ALL categories](category/category-get-all.md): `GET /api/categories/all`
-- [Create new category](category/category-post.md): `POST /api/categories`
-- [Update category](category/category-patch-pk.md): `PATCH /api/categories/:id`
+- [Get ALL categories](categories/category-get-all.md): `GET /api/categories/all`
+- [Create new category](categories/category-post.md): `POST /api/categories`
+- [Update category](categories/category-patch-pk.md): `PATCH /api/categories/:id`
 
 ### Images
 - [Upload image](images/image-post-upload.md): `POST /api/images/upload`
@@ -40,3 +44,6 @@ to administrator accounts.
 ### Item Listings
 - [Create new item listing](item-listings/item-listings-post.md): `POST /api/item-listings`
 - [Update item listing](item-listings/item-listings-patch-id.md): `PATCH /api/item-listings/:id`
+
+### Orders
+- [Get orders organized by status](orders/orders-get.md): `GET /api/orders`
