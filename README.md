@@ -10,5 +10,12 @@
     A Spring Boot API service that powers the core features of Yell Records.
 </p>
 
-This repository is public for CI/CD purposes only. All rights reserved. No permission is granted to use, copy, modify, 
-or distribute this code.
+> [!NOTE]
+> This repository is public for CI/CD purposes only. All rights reserved. No permission is granted to use, copy, modify, 
+> or distribute this code.
+
+## Project Overview
+This Spring Boot application hosts RESTful operations on the Yell Records database. For precise documentation, look
+through the [docs](docs) folder.
+
+The services here primarily co-exist with the front-end application. 

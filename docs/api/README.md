@@ -22,6 +22,7 @@ Endpoints for item listing categories.
 ### Item Listings
 Endpoints for products being sold.
 - [Get all item listings](item-listings/item-listings-get.md): `GET /api/item-listings`
+- [Get item listing by ID](item-listings/item-listings-get-id.md): `GET /api/item-listings/:id`
 - [Get item listings under category](item-listings/item-listings-get-category.md): `GET /api/item-listings/category/:slug`
 
 ## Endpoints that require Authentication
@@ -38,3 +39,4 @@ to administrator accounts.
 
 ### Item Listings
 - [Create new item listing](item-listings/item-listings-post.md): `POST /api/item-listings`
+- [Update item listing](item-listings/item-listings-patch-id.md): `PATCH /api/item-listings/:id`
