@@ -4,6 +4,11 @@ A general overview of current REST endpoints the application uses.
 ## Open Endpoints
 Open endpoints require no Authentication.
 
+### Artist Pages
+HTML page data endpoints for music artists.
+- [Get all artist pages](artist-pages/artist-pages-get.md): `GET /api/artist-pages`
+- [Get artist page by slug](artist-pages/artist-pages-get-slug.md): `GET /api/artist-pages/slug/:slug`
+
 ### Authentication
 Endpoints for login and endpoint authorization.
 - [Login](auth/auth-post-login.md): `POST /api/auth/login`
@@ -32,6 +37,11 @@ Endpoints for purchase orders
 ## Endpoints that require Authentication
 Closed endpoints require a valid Token to be included in the header request, which is usually only provided
 to administrator accounts.
+
+### Artist Pages
+- [Create new artist page](artist-pages/artist-pages-post.md): `POST /api/artist-pages`
+- [Update artist page](artist-pages/artist-pages-patch-id.md): `PATCH /api/artist-pages/:id`
+- [Delete artist page](artist-pages/artist-pages-delete-id.md): `DELETE /api/artist-pages/:id`
 
 ### Categories
 - [Get ALL categories](categories/category-get-all.md): `GET /api/categories/all`
