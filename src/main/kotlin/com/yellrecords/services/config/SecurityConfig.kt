@@ -40,8 +40,6 @@ class SecurityConfig {
         RoleHierarchyImpl.fromHierarchy(
             """
             ROLE_SUPERADMIN > ROLE_ADMIN
-            ROLE_ADMIN > ROLE_MODERATOR
-            ROLE_MODERATOR > ROLE_USER
             """.trimIndent(),
         )
 
