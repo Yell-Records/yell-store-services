@@ -48,5 +48,5 @@ class ItemListingController(
     fun editListing(
         @PathVariable listingId: UUID,
         @RequestBody updateListing: UpdateListingRequest,
-    ) = service.updateListing(listingId, updateListing)
+    ): ResponseEntity<Void> = service.updateListing(listingId, updateListing)
 }

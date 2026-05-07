@@ -2,21 +2,8 @@ spring:
   application:
     name: yell-store-services
 
-  config:
-    activate:
-      on-profile: dev
-
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-  flyway:
-    url: ${DB_URL}
-    user: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    placeholders:
-      emailCheck: "buyer_email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'"
+  profiles:
+    default: dev
 
   servlet:
     multipart:
@@ -24,18 +11,7 @@ spring:
       max-request-size: 10MB
 
   jpa:
-    hibernate:
-      ddl-auto: validate
     show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-
-app:
-  public-url: ${PUBLIC_URL:http://localhost:8080}
-
-jwt:
-  secret: ${JWT_SECRET}
 
 logging:
   level:

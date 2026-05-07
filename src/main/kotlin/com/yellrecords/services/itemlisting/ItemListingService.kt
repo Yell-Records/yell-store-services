@@ -7,6 +7,7 @@ import com.yellrecords.services.itemlisting.dto.CreateListingRequest
 import com.yellrecords.services.itemlisting.dto.ItemListingDto
 import com.yellrecords.services.itemlisting.dto.ItemListingMapper
 import com.yellrecords.services.itemlisting.dto.UpdateListingRequest
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -60,23 +61,38 @@ class ItemListingService(
     fun updateListing(
         id: UUID,
         req: UpdateListingRequest,
-    ) {
+    ): ResponseEntity<Void> {
         val listing =
             itemListingRepo.findById(id).getOrElse {
                 throw NotFoundException("Item listing with ID $id not found")
             }
 
-        req.title?.let { listing.title = it }
-        req.description?.let { listing.description = it }
+        var updated = false
+
+        req.title?.let {
+            listing.title = it
+            updated = true
+        }
+        req.description?.let {
+            listing.description = it
+            updated = true
+        }
         req.price?.let { price ->
             if (price <= BigDecimal.ZERO) {
                 throw BadRequestException("Price must be greater than zero.")
             }
 
             listing.price = price
+            updated = true
         }
-        req.imageUrl?.let { listing.imageUrl = it }
-        req.isActive?.let { listing.isActive = it }
+        req.imageUrl?.let {
+            listing.imageUrl = it
+            updated = true
+        }
+        req.isActive?.let {
+            listing.isActive = it
+            updated = true
+        }
         req.categorySlug?.let { slug ->
             val category = categoryRepository.findCategoryBySlug(slug)
             if (category == null || !category.isActive) {
@@ -84,9 +100,16 @@ class ItemListingService(
             }
 
             listing.categoryId = category.id!!
+            updated = true
         }
 
-        listing.updatedAt = OffsetDateTime.now()
+        return if (updated) {
+            listing.updatedAt = OffsetDateTime.now()
+
+            ResponseEntity.ok().build()
+        } else {
+            ResponseEntity.noContent().build()
+        }
     }
 
     /** Saves a new item listing entity to the database and returns the provided information. */

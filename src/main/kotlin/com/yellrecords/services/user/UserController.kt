@@ -27,11 +27,13 @@ class UserController(
     ): UserDto = service.getUserById(id)
 
     @GetMapping("/me")
+    @RolesAllowed(UserRole.ADMIN)
     fun getMyself(
         @AuthenticationPrincipal user: CustomUserDetails,
     ): UserDto = service.getUserById(user.id)
 
     @PostMapping
+    @RolesAllowed(UserRole.ADMIN)
     fun createUser(
         @RequestBody registerInfo: RegistrationInfo,
     ): ResponseEntity<UserDto> {

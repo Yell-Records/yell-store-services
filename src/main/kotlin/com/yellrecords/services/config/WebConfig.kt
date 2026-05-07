@@ -1,5 +1,6 @@
 package com.yellrecords.services.config
 
+import com.yellrecords.services.images.ImageProvider
 import com.yellrecords.services.logging.RequestLoggingInterceptor
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.CorsRegistry
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class WebConfig(
     private val interceptor: RequestLoggingInterceptor,
+    private val imageConfig: ImagesConfig,
 ) : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
@@ -21,7 +23,11 @@ class WebConfig(
     }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        registry.addResourceHandler("/uploads/**").addResourceLocations("file:uploads/")
+        if (imageConfig.provider == ImageProvider.LOCAL) {
+            registry
+                .addResourceHandler("/uploads/**")
+                .addResourceLocations("file:${imageConfig.uploadDir}/")
+        }
     }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
