@@ -7,6 +7,7 @@ import com.yellrecords.services.category.mapper.CategoryMapper
 import com.yellrecords.services.exception.BadRequestException
 import com.yellrecords.services.exception.ForbiddenException
 import com.yellrecords.services.exception.NotFoundException
+import com.yellrecords.services.util.SLUG_REGEX
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,10 +19,6 @@ import kotlin.jvm.optionals.getOrElse
 class CategoryService(
     private val categoryRepository: CategoryRepository,
 ) {
-    companion object {
-        private val slugRegex = Regex("^[a-z0-9-]+$")
-    }
-
     /** Gets every category. */
     fun getAllCategories(): List<CategoryDto> = categoryRepository.findAllCategories().map { CategoryMapper.toDto(it) }
 
@@ -92,8 +89,8 @@ class CategoryService(
             throw ForbiddenException("Slug '$slug' already exists.")
         }
 
-        if (!slugRegex.matches(slug)) {
-            throw BadRequestException("Slug '$slug' must match regex: ${slugRegex.pattern}")
+        if (!SLUG_REGEX.matches(slug)) {
+            throw BadRequestException("Slug '$slug' must match regex: ${SLUG_REGEX.pattern}")
         }
     }
 }
