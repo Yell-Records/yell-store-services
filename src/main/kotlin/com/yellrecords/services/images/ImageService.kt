@@ -1,6 +1,6 @@
 package com.yellrecords.services.images
 
-import com.yellrecords.services.config.ImagesConfig
+import com.yellrecords.services.config.ImageUploadProperties
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Service
 class ImageService(
-    private val imageConfig: ImagesConfig,
+    private val imageConfig: ImageUploadProperties,
 ) {
     private val uploadDir: Path by lazy {
         val dir = Paths.get(imageConfig.uploadDir!!)

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConfigurationProperties(prefix = "images")
-class ImagesConfig {
+class ImageUploadProperties {
     lateinit var provider: ImageProvider
 
     var uploadDir: String? = null

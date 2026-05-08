@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class WebConfig(
     private val interceptor: RequestLoggingInterceptor,
-    private val imageConfig: ImagesConfig,
+    private val imageConfig: ImageUploadProperties,
 ) : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
