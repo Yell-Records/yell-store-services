@@ -26,7 +26,7 @@ class Order(
     @Column(name = "buyer_email") var buyerEmail: String,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var status: OrderStatus = OrderStatus.IN_PROGRESS,
+    var status: OrderStatus = OrderStatus.AWAITING_PAYMENT,
     @Column(name = "total_paid", nullable = false) var totalPaid: BigDecimal,
     @Column(name = "created_at", nullable = false)
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
@@ -42,6 +42,8 @@ class Order(
     @Column(name = "tracking_number") var trackingNumber: String? = null,
     @Column(name = "tracking_carrier") var trackingCarrier: String? = null,
     @Column(name = "shipped_at") var shippedAt: OffsetDateTime? = null,
+    @Column(name = "paypal_order_id", nullable = false) var paypalOrderId: String,
+    @Column(name = "paypal_capture_id") var paypalCaptureId: String? = null,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var orderItems: MutableList<OrderItem> = mutableListOf(),
 )

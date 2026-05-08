@@ -39,7 +39,7 @@ class PayPalClient(
                 token
             }
 
-    fun post(
+    private fun post(
         path: String,
         body: Any,
     ): Mono<JsonNode> =
@@ -61,4 +61,15 @@ class PayPalClient(
                     }
                 }
         }
+
+    fun createPayPalOrder(amount: String): Mono<String> {
+        val body =
+            mapOf(
+                "intent" to "CAPTURE",
+                "purchase_units" to
+                    listOf(mapOf("amount" to mapOf("currency_code" to "USD", "value" to amount))),
+            )
+
+        return post("/v2/checkout/orders", body).map { json -> json["id"].asString() }
+    }
 }

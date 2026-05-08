@@ -7,6 +7,7 @@ import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.order.mapper.OrderMapper
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
+import com.yellrecords.services.paypal.PayPalClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -16,6 +17,7 @@ import java.time.OffsetDateTime
 class OrderService(
     private val orderRepository: OrderRepository,
     private val cartItemService: CartItemService,
+    private val paypalClient: PayPalClient,
 ) {
     /** Retrieves all orders with only order items associated by the seller. */
     fun getOrdersForSeller(unfinished: Boolean): List<OrderDto> {
@@ -46,9 +48,13 @@ class OrderService(
         val cartItems = cartItemService.getCartItemsByGuestId(orderInfo.guestSessionId)
         cartItems.ifEmpty { throw BadRequestException("Order has no items!") }
 
-        // TODO Process payments here
-
         val orderEntity = OrderMapper.asNewEntity(orderInfo, OffsetDateTime.now())
+
+        val paypalOrderId =
+            paypalClient.createPayPalOrder(orderInfo.totalPaid.toString()).block()
+                ?: throw BadRequestException("Failed to create PayPal order.")
+
+        orderEntity.paypalOrderId = paypalOrderId
 
         // Convert all cart items from the client into order items
         cartItems.forEach { cartItemDto ->

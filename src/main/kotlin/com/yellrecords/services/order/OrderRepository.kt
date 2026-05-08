@@ -18,6 +18,7 @@ interface OrderRepository : JpaRepository<Order, UUID> {
         """
             SELECT o FROM Order o
             WHERE o.status != 'IN_PROGRESS'
+                AND o.status != 'AWAITING_PAYMENT'
             ORDER BY o.shippedAt DESC
         """,
     )
