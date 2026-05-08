@@ -2,12 +2,14 @@
 If no profile is specified, the application defaults to **dev**.
 
 ## Development (dev)
-Default profile, or when `SPRING_PROFILES_ACTIVE=dev`.
+Default profile.
 
 ### Required
 - `DB_URL` - Local Postgres URL
 - `DB_USERNAME` - Username for database user
 - `DB_PASSWORD` - Password for database user
+- `PAYPAL_CLIENT_ID` - Client ID for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
+- `PAYPAL_CLIENT_SECRET` - Client secret for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
 
 ### Optional
 - `IMAGE_PROVIDER`
@@ -31,7 +33,7 @@ Default profile, or when `SPRING_PROFILES_ACTIVE=dev`.
   - Encryption strength must be 256 bits
 
 ## Production (prod)
-Profile for public use.
+Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 
 ### Required
 - `DB_URL` - Postgres database URL
@@ -42,3 +44,5 @@ Profile for public use.
 - `IMAGE_PROVIDER` - Should be set to S3, but can be set to LOCAL if needed
 - `IMAGE_UPLOAD_DIR` - Directory for image uploads
 - `JWT_SECRET` - 256-bit encryption secret for generating Java Web Tokens
+- `PAYPAL_CLIENT_ID` - Client ID for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
+- `PAYPAL_CLIENT_SECRET` - Client secret for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>

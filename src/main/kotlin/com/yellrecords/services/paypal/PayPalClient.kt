@@ -52,13 +52,10 @@ class PayPalClient(
                 .bodyValue(body)
                 .exchangeToMono { response ->
                     response.bodyToMono<String>().flatMap { raw ->
-                        println("RAW POST RESPONSE: $raw")
-
                         if (!response.statusCode().is2xxSuccessful) {
                             return@flatMap Mono.error(RuntimeException("PayPal error: $raw"))
                         }
 
-                        // Only parse JSON AFTER confirming it's JSON
                         val json = objectMapper.readTree(raw)
                         Mono.just(json as JsonNode)
                     }
