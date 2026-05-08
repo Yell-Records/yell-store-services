@@ -21,5 +21,10 @@ images:
   bucket:
   base-url:
 
+paypal:
+  client-id:
+  client-secret:
+  mode: sandbox
+
 jwt:
   secret: qKbdSQ3bgLRZJWH29euWFYxG2PZrBCEgPQJWPOs0v1P
