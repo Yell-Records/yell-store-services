@@ -38,12 +38,13 @@ class Order(
     @Column(name = "shipping_state", nullable = false) var shippingState: String,
     @Column(name = "shipping_postal_code", nullable = false) var shippingPostalCode: String,
     @Column(name = "shipping_phone", nullable = false) var shippingPhone: String,
-    @Column(name = "paid_at", nullable = false) var paidAt: OffsetDateTime,
+    @Column(name = "paid_at") var paidAt: OffsetDateTime? = null,
     @Column(name = "tracking_number") var trackingNumber: String? = null,
     @Column(name = "tracking_carrier") var trackingCarrier: String? = null,
     @Column(name = "shipped_at") var shippedAt: OffsetDateTime? = null,
-    @Column(name = "paypal_order_id", nullable = false) var paypalOrderId: String,
+    @Column(name = "paypal_order_id") var paypalOrderId: String? = null,
     @Column(name = "paypal_capture_id") var paypalCaptureId: String? = null,
+    @Column(name = "guest_session_id", nullable = false) var guestSessionId: UUID,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var orderItems: MutableList<OrderItem> = mutableListOf(),
 )

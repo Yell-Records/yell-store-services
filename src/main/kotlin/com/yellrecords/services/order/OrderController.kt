@@ -2,16 +2,21 @@ package com.yellrecords.services.order
 
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
+import com.yellrecords.services.order.dto.UpdateOrderDto
+import com.yellrecords.services.paypal.PayPalOrderResponse
 import com.yellrecords.services.user.UserRole
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/orders")
@@ -20,9 +25,14 @@ class OrderController(
 ) {
     @GetMapping
     @RolesAllowed(UserRole.ADMIN)
-    fun getRelevantOrdersToSeller(
+    fun getOrdersForAdmin(
         @RequestParam(required = true) unfinished: Boolean,
     ): List<OrderDto> = orderService.getOrdersForSeller(unfinished)
+
+    @PostMapping("/{id}/paypal/create")
+    fun createPaypalOrder(
+        @PathVariable id: UUID,
+    ): PayPalOrderResponse = orderService.createPayPalOrder(id)
 
     @PostMapping
     fun createOrder(
@@ -32,4 +42,15 @@ class OrderController(
 
         return ResponseEntity(orderWithItems, HttpStatus.CREATED)
     }
+
+    @PostMapping("/{id}/paypal/capture")
+    fun capturePayment(
+        @PathVariable id: UUID,
+    ): OrderDto = orderService.captureOrder(id)
+
+    @PatchMapping("/{id}")
+    fun updateOrder(
+        @PathVariable id: UUID,
+        @RequestBody updateOrderDto: UpdateOrderDto,
+    ): ResponseEntity<Void> = orderService.updateOrder(id, updateOrderDto)
 }

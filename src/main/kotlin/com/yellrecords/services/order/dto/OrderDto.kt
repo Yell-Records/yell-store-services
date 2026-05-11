@@ -23,6 +23,6 @@ data class OrderDto(
     val orderItems: List<OrderItemDto>,
     val trackingNumber: String?,
     val trackingCarrier: String?,
-    val paidAt: OffsetDateTime,
+    val paidAt: OffsetDateTime?,
     val shippedAt: OffsetDateTime?,
 )

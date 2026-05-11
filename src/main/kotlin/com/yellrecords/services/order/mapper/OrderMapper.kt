@@ -4,7 +4,6 @@ import com.yellrecords.services.order.Order
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
-import java.time.OffsetDateTime
 
 object OrderMapper {
     fun toDto(entity: Order) =
@@ -29,20 +28,18 @@ object OrderMapper {
             paidAt = entity.paidAt,
         )
 
-    fun asNewEntity(
-        dto: CreateOrderRequestDto,
-        paidAt: OffsetDateTime,
-    ) = Order(
-        buyerEmail = dto.buyerEmail,
-        totalPaid = dto.totalPaid,
-        shippingFirstName = dto.shippingFirstName,
-        shippingLastName = dto.shippingLastName,
-        shippingAddressLine1 = dto.shippingAddressLine1,
-        shippingAddressLine2 = dto.shippingAddressLine2,
-        shippingCity = dto.shippingCity,
-        shippingState = dto.shippingState,
-        shippingPostalCode = dto.shippingPostalCode,
-        shippingPhone = dto.shippingPhone,
-        paidAt = paidAt,
-    )
+    fun asNewEntity(dto: CreateOrderRequestDto) =
+        Order(
+            guestSessionId = dto.guestSessionId,
+            buyerEmail = dto.buyerEmail,
+            totalPaid = dto.totalPaid,
+            shippingFirstName = dto.shippingFirstName,
+            shippingLastName = dto.shippingLastName,
+            shippingAddressLine1 = dto.shippingAddressLine1,
+            shippingAddressLine2 = dto.shippingAddressLine2,
+            shippingCity = dto.shippingCity,
+            shippingState = dto.shippingState,
+            shippingPostalCode = dto.shippingPostalCode,
+            shippingPhone = dto.shippingPhone,
+        )
 }

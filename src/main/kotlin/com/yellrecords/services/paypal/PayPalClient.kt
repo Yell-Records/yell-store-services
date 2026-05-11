@@ -4,11 +4,13 @@ import com.yellrecords.services.config.PayPalProperties
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.treeToValue
 
 @Service
 class PayPalClient(
@@ -39,27 +41,25 @@ class PayPalClient(
                 token
             }
 
-    private fun post(
-        path: String,
-        body: Any,
-    ): Mono<JsonNode> =
+    private fun postCheckout(body: Any): Mono<JsonNode> =
         getAccessToken().flatMap { token ->
             client
                 .post()
-                .uri(path)
+                .uri("/v2/checkout/orders")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .bodyValue(body)
-                .exchangeToMono { response ->
-                    response.bodyToMono<String>().flatMap { raw ->
-                        if (!response.statusCode().is2xxSuccessful) {
-                            return@flatMap Mono.error(RuntimeException("PayPal error: $raw"))
-                        }
+                .exchangeToMono { handlePayPalResponse(it) }
+        }
 
-                        val json = objectMapper.readTree(raw)
-                        Mono.just(json as JsonNode)
-                    }
-                }
+    private fun handlePayPalResponse(response: ClientResponse): Mono<JsonNode> =
+        response.bodyToMono<String>().flatMap { raw ->
+            if (!response.statusCode().is2xxSuccessful) {
+                return@flatMap Mono.error(RuntimeException("PayPal error: $raw"))
+            }
+
+            val json = objectMapper.readTree(raw)
+            Mono.just(json as JsonNode)
         }
 
     fun createPayPalOrder(amount: String): Mono<String> {
@@ -70,6 +70,34 @@ class PayPalClient(
                     listOf(mapOf("amount" to mapOf("currency_code" to "USD", "value" to amount))),
             )
 
-        return post("/v2/checkout/orders", body).map { json -> json["id"].asString() }
+        return postCheckout(body).map { json -> json["id"].asString() }
+    }
+
+    /**
+     * Sends a request to mark payment on a PayPal order.
+     *
+     * @return The captureId
+     */
+    fun captureOrder(paypalOrderId: String): String {
+        val captureResponseJson =
+            getAccessToken()
+                .flatMap { token ->
+                    client
+                        .post()
+                        .uri("/v2/checkout/orders/$paypalOrderId/capture")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                        .exchangeToMono { handlePayPalResponse(it) }
+                }.block() ?: error("PayPal capture returned null")
+
+        val dto = objectMapper.treeToValue<PayPalCaptureResponse>(captureResponseJson)
+        val captureId =
+            dto.purchaseUnits
+                .first()
+                .payments.captures
+                .first()
+                .id
+
+        return captureId
     }
 }
