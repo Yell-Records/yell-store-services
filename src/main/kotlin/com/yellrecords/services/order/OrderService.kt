@@ -12,7 +12,6 @@ import com.yellrecords.services.order.mapper.OrderMapper
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
 import com.yellrecords.services.paypal.PayPalClient
 import com.yellrecords.services.paypal.PayPalOrderResponse
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -108,7 +107,7 @@ class OrderService(
     fun updateOrder(
         orderId: UUID,
         updates: UpdateOrderDto,
-    ): ResponseEntity<Void> {
+    ): OrderDto {
         val order =
             orderRepository.findById(orderId).getOrElse {
                 throw NotFoundException("Order with id $orderId not found.")
@@ -133,7 +132,7 @@ class OrderService(
         updates.shippingPostalCode?.let { order.shippingPostalCode = it }
         updates.shippingPhone?.let { order.shippingPhone = it }
 
-        return ResponseEntity.ok().build()
+        return OrderMapper.toDto(order)
     }
 
     private fun ensureCorrectOrderState(order: Order) {

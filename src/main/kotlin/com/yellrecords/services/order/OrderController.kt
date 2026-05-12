@@ -52,5 +52,5 @@ class OrderController(
     fun updateOrder(
         @PathVariable id: UUID,
         @RequestBody updateOrderDto: UpdateOrderDto,
-    ): ResponseEntity<Void> = orderService.updateOrder(id, updateOrderDto)
+    ): OrderDto = orderService.updateOrder(id, updateOrderDto)
 }

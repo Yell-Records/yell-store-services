@@ -1,6 +1,7 @@
 package com.yellrecords.services.paypal
 
 import com.yellrecords.services.config.PayPalProperties
+import org.apache.coyote.BadRequestException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
@@ -74,7 +75,7 @@ class PayPalClient(
     }
 
     /**
-     * Sends a request to mark payment on a PayPal order.
+     * Gets the capture ID if the user confirmed and processed their payment through PayPal.
      *
      * @return The captureId
      */
@@ -91,13 +92,12 @@ class PayPalClient(
                 }.block() ?: error("PayPal capture returned null")
 
         val dto = objectMapper.treeToValue<PayPalCaptureResponse>(captureResponseJson)
-        val captureId =
+        val completedCapture =
             dto.purchaseUnits
-                .first()
-                .payments.captures
-                .first()
-                .id
+                .flatMap { it.payments.captures }
+                .firstOrNull { it.status == "COMPLETED" }
+                ?: throw BadRequestException("PayPal captures have no completed status.")
 
-        return captureId
+        return completedCapture.id
     }
 }
