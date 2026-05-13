@@ -22,7 +22,7 @@ object TaxUtil {
         subtotal: BigDecimal,
     ): BigDecimal =
         if (shippingState == "IL") {
-            subtotal.multiply(ILLINOIS_TAX_RATE).setScale(2, RoundingMode.HALF_UP)
+            subtotal.multiply(ILLINOIS_TAX_RATE).setScale(2, RoundingMode.DOWN)
         } else {
             BigDecimal.ZERO
         }
