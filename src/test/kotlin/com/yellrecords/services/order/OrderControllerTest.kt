@@ -3,18 +3,26 @@ package com.yellrecords.services.order
 import com.yellrecords.services.BaseH2Test
 import com.yellrecords.services.cart.CartItem
 import com.yellrecords.services.cart.CartItemRepository
+import com.yellrecords.services.cart.CartItemService
 import com.yellrecords.services.itemlisting.ItemListing
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
+import com.yellrecords.services.order.dto.UpdateOrderDto
 import com.yellrecords.services.orderitem.OrderItemRepository
+import com.yellrecords.services.paypal.PayPalClient
 import io.kotest.inspectors.forOne
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import tools.jackson.module.kotlin.readValue
@@ -24,7 +32,11 @@ import java.util.UUID
 class OrderControllerTest : BaseH2Test() {
     companion object {
         private const val BASE_PATH = "/api/orders"
+        private const val MOCK_PAYPAL_ORDER_ID = "5O190127TN364715T"
+        private const val MOCK_PAYPAL_CAPTURE_ID = "7JD73392FH834931L"
     }
+
+    @Autowired lateinit var cartItemService: CartItemService
 
     @Autowired lateinit var orderRepository: OrderRepository
 
@@ -38,6 +50,8 @@ class OrderControllerTest : BaseH2Test() {
     private lateinit var listing2: ItemListing
 
     private val guestId = UUID.randomUUID()
+
+    private val mockPayPalClient = mock<PayPalClient>()
 
     /** Pre-fills a create order request with shipping information. */
     private fun genCreateOrder(
@@ -94,23 +108,50 @@ class OrderControllerTest : BaseH2Test() {
             }
         }
 
-        @Nested
-        inner class IntegrityTests {
-            private val guestRequest = genCreateOrder(totalPaid = BigDecimal("300.0"))
+        @Test
+        fun `should create order items based on items in cart`() {
+            val guestRequest = genCreateOrder(totalPaid = BigDecimal("300.0"))
 
-            @Test
-            fun `should create order items based on items in cart`() {
-                mockRequest(requestType = POST, path = BASE_PATH, token = null, body = guestRequest)
-                    .andExpect(status().isCreated)
+            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = guestRequest)
+                .andExpect(status().isCreated)
 
-                val allOrders = orderRepository.findAll().toList()
-                allOrders shouldHaveSize 1
+            val allOrders = orderRepository.findAll().toList()
+            allOrders shouldHaveSize 1
 
-                val guestOrder = allOrders.first()
-                val orderItems = orderItemRepository.findOrderItemsByOrderId(guestOrder.id!!)
-                orderItems shouldHaveSize 1
-                orderItems.forOne { it.listingId shouldBe listing1.id }
-            }
+            val guestOrder = allOrders.first()
+            val orderItems = orderItemRepository.findOrderItemsByOrderId(guestOrder.id!!)
+            orderItems shouldHaveSize 1
+            orderItems.forOne { it.listingId shouldBe listing1.id }
+        }
+
+        @Test
+        fun `should clear cart items after payment capture`() {
+            val guestRequest =
+                genCreateOrder(guestSessionId = guestId, buyerEmail = "email@test.com")
+
+            val dto = orderService.createOrder(guestRequest)
+
+            val saved = orderRepository.findById(dto.id).get()
+            saved.paypalOrderId = MOCK_PAYPAL_ORDER_ID
+
+            whenever(mockPayPalClient.captureOrder(saved.paypalOrderId!!))
+                .thenReturn(MOCK_PAYPAL_CAPTURE_ID)
+
+            val preCartItems = cartItemRepository.findGuestCartItems(guestId)
+            preCartItems.shouldNotBeEmpty()
+
+            val mockOrderService =
+                OrderService(
+                    orderRepository = orderRepository,
+                    cartItemService = cartItemService,
+                    paypalClient = mockPayPalClient,
+                )
+
+            mockOrderService.captureOrder(saved.id!!)
+
+            // Check cart
+            val cartItems = cartItemRepository.findGuestCartItems(guestId)
+            cartItems.shouldBeEmpty()
         }
     }
 
@@ -144,6 +185,71 @@ class OrderControllerTest : BaseH2Test() {
             orders shouldHaveSize 1
 
             orders.first().status shouldBe OrderStatus.PAID
+        }
+    }
+
+    @Nested
+    inner class PatchOrder {
+        private lateinit var guestOrder: Order
+
+        @BeforeEach
+        fun init() {
+            val guestRequest =
+                genCreateOrder(guestSessionId = guestId, buyerEmail = "email@test.com")
+
+            val dto = orderService.createOrder(guestRequest)
+
+            // Set status to paid to simulate in-progress
+            guestOrder = orderRepository.findById(dto.id).get()
+        }
+
+        @Test
+        fun `should return 403 forbidden on mis-match guest session id`() {
+            val req = UpdateOrderDto(guestSessionId = UUID.randomUUID(), shippingCity = "NY")
+
+            mockRequest(
+                requestType = PATCH,
+                path = "$BASE_PATH/${guestOrder.id}",
+                token = null,
+                body = req,
+            ).andExpect(status().isForbidden)
+        }
+
+        @Test
+        fun `should return 403 forbidden when status has changed`() {
+            guestOrder.status = OrderStatus.PAID
+
+            orderRepository.save(guestOrder)
+
+            val req = UpdateOrderDto(guestSessionId = guestId, shippingCity = "NY")
+
+            mockRequest(
+                requestType = PATCH,
+                path = "$BASE_PATH/${guestOrder.id}",
+                token = null,
+                body = req,
+            ).andExpect(status().isForbidden)
+        }
+
+        @Test
+        fun `should update order details`() {
+            val req =
+                UpdateOrderDto(
+                    guestSessionId = guestId,
+                    shippingCity = "NY",
+                    shippingFirstName = "Toby",
+                )
+
+            mockRequest(
+                requestType = PATCH,
+                path = "$BASE_PATH/${guestOrder.id}",
+                token = null,
+                body = req,
+            ).andExpect(status().isOk)
+
+            val updatedOrder = orderRepository.findById(guestOrder.id!!).get()
+            updatedOrder.shippingCity shouldBe req.shippingCity
+            updatedOrder.shippingFirstName shouldBe req.shippingFirstName
         }
     }
 }
