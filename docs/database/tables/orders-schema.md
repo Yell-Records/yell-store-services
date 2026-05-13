@@ -71,7 +71,6 @@ Otherwise, order entities are never deleted for financial record history.
 - `paypal_capture_id` - Capture ID for PayPal. This is set once the user completes and authorizes payment.
 
 ## 🤝Relationships
-- Belongs to: **users** - Only users can create an order.
 - Has many: **order items** - Individual items associated with the order.
 
 ## 🔒Invariants
