@@ -30,5 +30,11 @@ paypal:
   client-secret: ${PAYPAL_CLIENT_SECRET}
   mode: live
 
+jobs:
+  stale-order-cleanup:
+    enabled: ${JOB_STALE_ORDERS_ENABLED:true}
+    cutoff-days: ${JOB_STALE_ORDERS_CUTOFF_DAYS:3}
+    cron: "${JOB_STALE_ORDERS_CRON:0 0 2 * * *}"
+
 jwt:
   secret: ${JWT_SECRET}

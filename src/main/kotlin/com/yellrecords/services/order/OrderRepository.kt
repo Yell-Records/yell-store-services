@@ -2,6 +2,7 @@ package com.yellrecords.services.order
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import java.time.OffsetDateTime
 import java.util.UUID
 
 interface OrderRepository : JpaRepository<Order, UUID> {
@@ -25,4 +26,13 @@ interface OrderRepository : JpaRepository<Order, UUID> {
         """,
     )
     fun findFinishedOrders(): List<Order>
+
+    @Query(
+        """
+            SELECT o FROM Order o
+            WHERE o.status = 'AWAITING_PAYMENT'
+                AND o.createdAt < :cutoff
+        """,
+    )
+    fun findAllToClean(cutoff: OffsetDateTime): List<Order>
 }
