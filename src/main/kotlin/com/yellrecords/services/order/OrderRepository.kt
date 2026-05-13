@@ -9,6 +9,7 @@ interface OrderRepository : JpaRepository<Order, UUID> {
         """
             SELECT o FROM Order o
             WHERE o.status = 'IN_PROGRESS'
+                OR o.status = 'PAID'
             ORDER BY o.paidAt DESC
         """,
     )
@@ -19,6 +20,7 @@ interface OrderRepository : JpaRepository<Order, UUID> {
             SELECT o FROM Order o
             WHERE o.status != 'IN_PROGRESS'
                 AND o.status != 'AWAITING_PAYMENT'
+                AND o.status != 'PAID'
             ORDER BY o.shippedAt DESC
         """,
     )

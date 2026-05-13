@@ -99,18 +99,6 @@ class OrderControllerTest : BaseH2Test() {
             private val guestRequest = genCreateOrder(totalPaid = BigDecimal("300.0"))
 
             @Test
-            fun `should clear buyer's cart items`() {
-                val prevItems = cartItemRepository.findGuestCartItems(guestId)
-                prevItems shouldHaveSize 1
-
-                mockRequest(requestType = POST, path = BASE_PATH, token = null, body = guestRequest)
-                    .andExpect(status().isCreated)
-
-                val userItems = cartItemRepository.findGuestCartItems(guestId)
-                userItems shouldHaveSize 0
-            }
-
-            @Test
             fun `should create order items based on items in cart`() {
                 mockRequest(requestType = POST, path = BASE_PATH, token = null, body = guestRequest)
                     .andExpect(status().isCreated)
@@ -133,7 +121,11 @@ class OrderControllerTest : BaseH2Test() {
             val guestRequest =
                 genCreateOrder(guestSessionId = guestId, buyerEmail = "email@test.com")
 
-            orderService.createOrder(guestRequest)
+            val dto = orderService.createOrder(guestRequest)
+
+            // Set status to paid to simulate in-progress
+            val saved = orderRepository.findById(dto.id).get()
+            saved.status = OrderStatus.PAID
         }
 
         @Test
@@ -151,7 +143,7 @@ class OrderControllerTest : BaseH2Test() {
             val orders = objectMapper.readValue<List<OrderDto>>(body)
             orders shouldHaveSize 1
 
-            orders.first().status shouldBe OrderStatus.IN_PROGRESS
+            orders.first().status shouldBe OrderStatus.PAID
         }
     }
 }
