@@ -31,8 +31,11 @@ Endpoints for products being sold.
 - [Get item listings under category](item-listings/item-listings-get-category.md): `GET /api/item-listings/category/:slug`
 
 ### Orders
-Endpoints for purchase orders
+Endpoints for purchase orders.
 - [Create / place order](orders/orders-post.md): `POST /api/orders`
+- [Create PayPal order](orders/orders-post-paypal-order.md): `POST /api/orders/:id/paypal/create`
+- [Capture PayPal order](orders/orders-post-paypal-capture.md): `POST /api/orders/:id/paypal/capture`
+- [Update order details](orders/orders-patch-id.md): `PATCH /api/orders/:id`
 
 ## Endpoints that require Authentication
 Closed endpoints require a valid Token to be included in the header request, which is usually only provided

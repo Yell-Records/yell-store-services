@@ -25,5 +25,16 @@ images:
   bucket: ${IMAGE_BUCKET:}
   base-url: ${IMAGE_BASE_URL:}
 
+paypal:
+  client-id: ${PAYPAL_CLIENT_ID}
+  client-secret: ${PAYPAL_CLIENT_SECRET}
+  mode: sandbox
+
+jobs:
+  stale-order-cleanup:
+    enabled: true
+    cutoff-days: 1
+    cron: "0 */5 * * * *"
+
 jwt:
   secret: ${JWT_SECRET:5ffSrvavg96EzEcIf04juxRFgA1vudQ7WUOjbO2LgGk}

@@ -26,8 +26,11 @@ class Order(
     @Column(name = "buyer_email") var buyerEmail: String,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var status: OrderStatus = OrderStatus.IN_PROGRESS,
-    @Column(name = "total_paid", nullable = false) var totalPaid: BigDecimal,
+    var status: OrderStatus = OrderStatus.AWAITING_PAYMENT,
+    @Column(name = "shipping_cost", nullable = false) var shippingCost: BigDecimal,
+    @Column(nullable = false) var subtotal: BigDecimal,
+    @Column(nullable = false) var tax: BigDecimal,
+    @Column(name = "total_paid") var totalPaid: BigDecimal? = null,
     @Column(name = "created_at", nullable = false)
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
     @Column(name = "shipping_first_name", nullable = false) var shippingFirstName: String,
@@ -38,10 +41,13 @@ class Order(
     @Column(name = "shipping_state", nullable = false) var shippingState: String,
     @Column(name = "shipping_postal_code", nullable = false) var shippingPostalCode: String,
     @Column(name = "shipping_phone", nullable = false) var shippingPhone: String,
-    @Column(name = "paid_at", nullable = false) var paidAt: OffsetDateTime,
+    @Column(name = "paid_at") var paidAt: OffsetDateTime? = null,
     @Column(name = "tracking_number") var trackingNumber: String? = null,
     @Column(name = "tracking_carrier") var trackingCarrier: String? = null,
     @Column(name = "shipped_at") var shippedAt: OffsetDateTime? = null,
+    @Column(name = "paypal_order_id") var paypalOrderId: String? = null,
+    @Column(name = "paypal_capture_id") var paypalCaptureId: String? = null,
+    @Column(name = "guest_session_id", nullable = false) var guestSessionId: UUID,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var orderItems: MutableList<OrderItem> = mutableListOf(),
 )

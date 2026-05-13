@@ -22,5 +22,16 @@ images:
   bucket:
   base-url:
 
+paypal:
+  client-id:
+  client-secret:
+  mode: sandbox
+
+jobs:
+  stale-order-cleanup:
+    cutoff-days: 7
+    enabled: false
+    cron: "0 0 0 * * *"
+
 jwt:
   secret: qKbdSQ3bgLRZJWH29euWFYxG2PZrBCEgPQJWPOs0v1P

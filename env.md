@@ -2,12 +2,14 @@
 If no profile is specified, the application defaults to **dev**.
 
 ## Development (dev)
-Default profile, or when `SPRING_PROFILES_ACTIVE=dev`.
+Default profile.
 
 ### Required
 - `DB_URL` - Local Postgres URL
 - `DB_USERNAME` - Username for database user
 - `DB_PASSWORD` - Password for database user
+- `PAYPAL_CLIENT_ID` - Client ID for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
+- `PAYPAL_CLIENT_SECRET` - Client secret for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
 
 ### Optional
 - `IMAGE_PROVIDER`
@@ -31,7 +33,7 @@ Default profile, or when `SPRING_PROFILES_ACTIVE=dev`.
   - Encryption strength must be 256 bits
 
 ## Production (prod)
-Profile for public use.
+Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 
 ### Required
 - `DB_URL` - Postgres database URL
@@ -42,3 +44,22 @@ Profile for public use.
 - `IMAGE_PROVIDER` - Should be set to S3, but can be set to LOCAL if needed
 - `IMAGE_UPLOAD_DIR` - Directory for image uploads
 - `JWT_SECRET` - 256-bit encryption secret for generating Java Web Tokens
+- `PAYPAL_CLIENT_ID` - Client ID for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
+- `PAYPAL_CLIENT_SECRET` - Client secret for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
+
+### Optional
+
+#### Stale order cleanup job
+This scheduled job purges order entities in a "stale" state. A stale order is in status _AWAITING_PAYMENT_ and 
+is older than the set cutoff. These are considered "stale" as clients are not likely to be moving forward with these
+orders.
+- `JOB_STALE_ORDERS_ENABLED`
+  - Default `true`
+  - If this job should run.
+- `JOB_STALE_ORDERS_CUTOFF_DAYS`
+  - Default 3
+  - The amount of days orders must be older than to be considered stale.
+- `JOB_STALE_ORDERS_CRON`
+  - Default `0 0 2 * * *` (every day at 2am)
+  - [Cron expression](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/scheduling/support/CronExpression.html)
+    for when this job should run.
