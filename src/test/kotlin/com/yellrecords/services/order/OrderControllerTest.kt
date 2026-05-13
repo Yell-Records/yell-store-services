@@ -47,7 +47,7 @@ class OrderControllerTest : BaseH2Test() {
     ) = CreateOrderRequestDto(
         guestSessionId = guestSessionId,
         buyerEmail = buyerEmail,
-        totalPaid = totalPaid,
+        subtotal = totalPaid,
         shippingFirstName = "Test",
         shippingLastName = "Last",
         shippingAddressLine1 = "123 street",

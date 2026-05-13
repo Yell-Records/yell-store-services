@@ -27,7 +27,10 @@ class Order(
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var status: OrderStatus = OrderStatus.AWAITING_PAYMENT,
-    @Column(name = "total_paid", nullable = false) var totalPaid: BigDecimal,
+    @Column(name = "shipping_cost", nullable = false) var shippingCost: BigDecimal,
+    @Column(nullable = false) var subtotal: BigDecimal,
+    @Column(nullable = false) var tax: BigDecimal,
+    @Column(name = "total_paid") var totalPaid: BigDecimal? = null,
     @Column(name = "created_at", nullable = false)
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
     @Column(name = "shipping_first_name", nullable = false) var shippingFirstName: String,

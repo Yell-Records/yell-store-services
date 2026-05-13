@@ -1,6 +1,13 @@
 package com.yellrecords.services.paypal
 
 import com.yellrecords.services.config.PayPalProperties
+import com.yellrecords.services.order.Order
+import com.yellrecords.services.order.total
+import com.yellrecords.services.paypal.CreatePayPalOrderRequest.PurchaseUnit
+import com.yellrecords.services.paypal.CreatePayPalOrderRequest.PurchaseUnit.Amount
+import com.yellrecords.services.paypal.CreatePayPalOrderRequest.PurchaseUnit.Shipping
+import com.yellrecords.services.paypal.CreatePayPalOrderRequest.PurchaseUnit.Shipping.ShippingAddress
+import com.yellrecords.services.paypal.CreatePayPalOrderRequest.PurchaseUnit.Shipping.ShippingName
 import org.apache.coyote.BadRequestException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -63,13 +70,26 @@ class PayPalClient(
             Mono.just(json as JsonNode)
         }
 
-    fun createPayPalOrder(amount: String): Mono<String> {
-        val body =
-            mapOf(
-                "intent" to "CAPTURE",
-                "purchase_units" to
-                    listOf(mapOf("amount" to mapOf("currency_code" to "USD", "value" to amount))),
+    fun createPayPalOrder(order: Order): Mono<String> {
+        val address =
+            ShippingAddress(
+                addressLine1 = order.shippingAddressLine1,
+                addressLine2 = order.shippingAddressLine2,
+                city = order.shippingCity,
+                state = order.shippingState,
+                postalCode = order.shippingPostalCode,
             )
+
+        val shipping =
+            Shipping(
+                name = ShippingName("${order.shippingFirstName} ${order.shippingLastName}"),
+                address = address,
+            )
+
+        val purchaseUnit =
+            PurchaseUnit(amount = Amount(order.total().toString()), shipping = shipping)
+
+        val body = CreatePayPalOrderRequest(purchaseUnits = listOf(purchaseUnit))
 
         return postCheckout(body).map { json -> json["id"].asString() }
     }

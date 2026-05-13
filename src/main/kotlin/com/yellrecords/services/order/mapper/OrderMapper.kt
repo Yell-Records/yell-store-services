@@ -4,6 +4,8 @@ import com.yellrecords.services.order.Order
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
+import com.yellrecords.services.util.ShippingUtil
+import com.yellrecords.services.util.TaxUtil
 
 object OrderMapper {
     fun toDto(entity: Order) =
@@ -11,6 +13,9 @@ object OrderMapper {
             id = entity.id!!,
             buyerEmail = entity.buyerEmail,
             status = entity.status,
+            subtotal = entity.subtotal,
+            shippingCost = entity.shippingCost,
+            tax = entity.tax,
             totalPaid = entity.totalPaid,
             createdAt = entity.createdAt,
             shippingFirstname = entity.shippingFirstName,
@@ -32,7 +37,9 @@ object OrderMapper {
         Order(
             guestSessionId = dto.guestSessionId,
             buyerEmail = dto.buyerEmail,
-            totalPaid = dto.totalPaid,
+            subtotal = dto.subtotal,
+            tax = TaxUtil.calculateTax(dto.shippingState, dto.subtotal),
+            shippingCost = ShippingUtil.FLAT_SHIPPING_COST,
             shippingFirstName = dto.shippingFirstName,
             shippingLastName = dto.shippingLastName,
             shippingAddressLine1 = dto.shippingAddressLine1,

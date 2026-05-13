@@ -12,6 +12,7 @@ import com.yellrecords.services.order.mapper.OrderMapper
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
 import com.yellrecords.services.paypal.PayPalClient
 import com.yellrecords.services.paypal.PayPalOrderResponse
+import com.yellrecords.services.util.TaxUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -44,9 +45,8 @@ class OrderService(
      */
     @Transactional
     fun createOrder(orderInfo: CreateOrderRequestDto): OrderDto {
-        // Total paid must be greater than 0
-        if (orderInfo.totalPaid <= BigDecimal.ZERO) {
-            throw BadRequestException("Total paid must be greater than 0.")
+        if (orderInfo.subtotal <= BigDecimal.ZERO) {
+            throw BadRequestException("Subtotal must be greater than 0.")
         }
 
         val cartItems = cartItemService.getCartItemsByGuestId(orderInfo.guestSessionId)
@@ -79,8 +79,12 @@ class OrderService(
         val captureId = paypalClient.captureOrder(order.paypalOrderId!!)
 
         order.paypalCaptureId = captureId
+        order.totalPaid = order.total()
         order.status = OrderStatus.PAID
         order.paidAt = OffsetDateTime.now()
+
+        // Clear the client's cart items
+        cartItemService.deleteGuestCartItems(order.guestSessionId)
 
         return OrderMapper.toDto(order)
     }
@@ -94,7 +98,7 @@ class OrderService(
 
         // Get PayPal information
         val paypalOrderId =
-            paypalClient.createPayPalOrder(order.totalPaid.toString()).block()
+            paypalClient.createPayPalOrder(order).block()
                 ?: throw BadRequestException("Failed to create PayPal order.")
 
         order.paypalOrderId = paypalOrderId
@@ -128,7 +132,10 @@ class OrderService(
         updates.shippingAddressLine1?.let { order.shippingAddressLine1 = it }
         updates.shippingAddressLine2?.let { order.shippingAddressLine2 = it }
         updates.shippingCity?.let { order.shippingCity = it }
-        updates.shippingState?.let { order.shippingState = it }
+        updates.shippingState?.let {
+            order.shippingState = it
+            order.tax = TaxUtil.calculateTax(it, order.subtotal)
+        }
         updates.shippingPostalCode?.let { order.shippingPostalCode = it }
         updates.shippingPhone?.let { order.shippingPhone = it }
 

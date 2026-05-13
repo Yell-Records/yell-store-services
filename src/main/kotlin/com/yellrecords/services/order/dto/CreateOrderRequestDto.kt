@@ -7,7 +7,7 @@ import java.util.UUID
 data class CreateOrderRequestDto(
     val guestSessionId: UUID,
     val buyerEmail: String,
-    val totalPaid: BigDecimal,
+    val subtotal: BigDecimal,
     val shippingFirstName: String,
     val shippingLastName: String,
     val shippingAddressLine1: String,
