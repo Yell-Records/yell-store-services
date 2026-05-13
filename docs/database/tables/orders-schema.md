@@ -50,11 +50,11 @@ items table).
 
 ## ⏱️Lifecycle
 ### ➕Row Creation
-An order is created when a client provides shipping information and confirms payment at cart checkout.
+An order is created when a client provides shipping information and proceeds to payment screen.
 
 ### 🔄Row Updates
-The order `status` will be updated from _IN_PROGRESS_ to _FULFILLED_ when all associated **order items** have all reached
-SHIPPED status.
+- Guests can update their orders if they navigate back to the shipping form at checkout.
+- The administrators can update order statuses.
 
 ### 🗑️Row Deletion
 Orders with a status of _AWAITING_PAYMENT_ are cleaned up after all the following conditions are met:

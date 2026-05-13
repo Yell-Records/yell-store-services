@@ -130,7 +130,9 @@ class OrderService(
         updates.shippingFirstName?.let { order.shippingFirstName = it }
         updates.shippingLastName?.let { order.shippingLastName = it }
         updates.shippingAddressLine1?.let { order.shippingAddressLine1 = it }
-        updates.shippingAddressLine2?.let { order.shippingAddressLine2 = it }
+
+        order.shippingAddressLine2 = updates.shippingAddressLine2
+
         updates.shippingCity?.let { order.shippingCity = it }
         updates.shippingState?.let {
             order.shippingState = it
