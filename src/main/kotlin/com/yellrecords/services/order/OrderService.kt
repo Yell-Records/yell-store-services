@@ -39,9 +39,10 @@ class OrderService(
     }
 
     fun getOrder(orderId: UUID): OrderDto {
-        val order = orderRepository.findById(orderId).getOrElse {
-            throw NotFoundException("Order with ID $orderId not found.")
-        }
+        val order =
+            orderRepository.findById(orderId).getOrElse {
+                throw NotFoundException("Order with ID $orderId not found.")
+            }
 
         return OrderMapper.toDto(order)
     }
