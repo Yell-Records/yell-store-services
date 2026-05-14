@@ -8,7 +8,7 @@ import java.util.UUID
 
 data class OrderDto(
     val id: UUID,
-    val orderId: Long,
+    val orderNumber: Long,
     val buyerEmail: String,
     val status: OrderStatus,
     val subtotal: BigDecimal,

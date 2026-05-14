@@ -29,6 +29,12 @@ class OrderController(
         @RequestParam(required = true) unfinished: Boolean,
     ): List<OrderDto> = orderService.getOrdersForSeller(unfinished)
 
+    @GetMapping("/{id}")
+    @RolesAllowed(UserRole.ADMIN)
+    fun getOrder(
+        @PathVariable id: UUID,
+    ): OrderDto = orderService.getOrder(id)
+
     @PostMapping("/{id}/paypal/create")
     fun createPaypalOrder(
         @PathVariable id: UUID,

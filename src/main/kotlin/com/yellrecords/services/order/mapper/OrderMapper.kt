@@ -11,6 +11,7 @@ object OrderMapper {
     fun toDto(entity: Order) =
         OrderDto(
             id = entity.id!!,
+            orderNumber = entity.orderNumber!!,
             buyerEmail = entity.buyerEmail,
             status = entity.status,
             subtotal = entity.subtotal,
@@ -31,7 +32,6 @@ object OrderMapper {
             orderItems = entity.orderItems.map { OrderItemMapper.toDto(it) },
             shippedAt = entity.shippedAt,
             paidAt = entity.paidAt,
-            orderId = entity.orderNumber!!,
         )
 
     fun asNewEntity(dto: CreateOrderRequestDto) =

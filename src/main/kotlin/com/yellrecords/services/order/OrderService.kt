@@ -38,6 +38,14 @@ class OrderService(
         return orders.map { order -> OrderMapper.toDto(order) }
     }
 
+    fun getOrder(orderId: UUID): OrderDto {
+        val order = orderRepository.findById(orderId).getOrElse {
+            throw NotFoundException("Order with ID $orderId not found.")
+        }
+
+        return OrderMapper.toDto(order)
+    }
+
     /**
      * Saves a new order and its items to the database using the buyer's associated cart items.
      *
