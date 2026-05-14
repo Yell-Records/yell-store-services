@@ -23,6 +23,7 @@ class Order(
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
     var id: UUID? = null,
+    @Column(name = "order_number", nullable = false) var orderNumber: Long? = null,
     @Column(name = "buyer_email") var buyerEmail: String,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
