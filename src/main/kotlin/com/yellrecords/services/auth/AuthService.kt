@@ -1,10 +1,16 @@
 package com.yellrecords.services.auth
 
+import com.yellrecords.services.auth.dto.ChangePasswordRequest
 import com.yellrecords.services.auth.dto.LoginResponse
 import com.yellrecords.services.exception.BadRequestException
+import com.yellrecords.services.exception.NotFoundException
 import com.yellrecords.services.user.UserRepository
+import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
+import kotlin.jvm.optionals.getOrElse
 
 @Service
 class AuthService(
@@ -33,5 +39,36 @@ class AuthService(
         val token = jwtService.generateToken(user.username, user.id!!, user.role)
 
         return LoginResponse(token = token, username = username)
+    }
+
+    @Transactional
+    fun changePassword(
+        userId: UUID,
+        changeRequest: ChangePasswordRequest,
+    ): ResponseEntity<Void> {
+        val user =
+            userRepository.findById(userId).getOrElse { throw NotFoundException("User not found.") }
+
+        // Validate current password
+        if (!passwordEncoder.matches(changeRequest.rawCurrent, user.passwordHash)) {
+            throw BadRequestException("Current password does not match.")
+        }
+
+        // Ensure equality on confirm password
+        if (changeRequest.rawNew != changeRequest.rawNew2) {
+            throw BadRequestException("New password does not match.")
+        }
+
+        // Ensure new password is different
+        if (changeRequest.rawCurrent == changeRequest.rawNew) {
+            throw BadRequestException("New password must be different from current password.")
+        }
+
+        val hashedNew =
+            passwordEncoder.encode(changeRequest.rawNew) ?: error("Could not hash password.")
+
+        user.passwordHash = hashedNew
+
+        return ResponseEntity.ok().build()
     }
 }
