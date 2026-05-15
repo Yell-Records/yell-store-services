@@ -13,6 +13,8 @@ import com.yellrecords.services.orderitem.mapper.OrderItemMapper
 import com.yellrecords.services.paypal.PayPalClient
 import com.yellrecords.services.paypal.PayPalOrderResponse
 import com.yellrecords.services.util.TaxUtil
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -26,6 +28,8 @@ class OrderService(
     private val cartItemService: CartItemService,
     private val paypalClient: PayPalClient,
 ) {
+    @PersistenceContext private lateinit var entityManager: EntityManager
+
     /** Retrieves all orders with only order items associated by the seller. */
     fun getOrdersForSeller(unfinished: Boolean): List<OrderDto> {
         val orders =
@@ -72,6 +76,10 @@ class OrderService(
         }
 
         val savedOrder = orderRepository.save(orderEntity)
+        // For order numbers, the database uses a number sequence that is not generated
+        // on save, so we need to flush and refresh the entity to retrieve the next value.
+        entityManager.flush()
+        entityManager.refresh(savedOrder)
 
         return OrderMapper.toDto(savedOrder)
     }
