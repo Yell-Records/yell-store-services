@@ -28,7 +28,6 @@ object OrderMapper {
             shippingPostalCode = entity.shippingPostalCode,
             shippingPhone = entity.shippingPhone,
             trackingNumber = entity.trackingNumber,
-            trackingCarrier = entity.trackingCarrier,
             orderItems = entity.orderItems.map { OrderItemMapper.toDto(it) },
             shippedAt = entity.shippedAt,
             paidAt = entity.paidAt,

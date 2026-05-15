@@ -7,6 +7,7 @@ import com.yellrecords.services.exception.ForbiddenException
 import com.yellrecords.services.exception.NotFoundException
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
+import com.yellrecords.services.order.dto.TrackingDetailsDto
 import com.yellrecords.services.order.dto.UpdateOrderDto
 import com.yellrecords.services.order.mapper.OrderMapper
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
@@ -15,6 +16,7 @@ import com.yellrecords.services.paypal.PayPalOrderResponse
 import com.yellrecords.services.util.TaxUtil
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -43,10 +45,7 @@ class OrderService(
     }
 
     fun getOrder(orderId: UUID): OrderDto {
-        val order =
-            orderRepository.findById(orderId).getOrElse {
-                throw NotFoundException("Order with ID $orderId not found.")
-            }
+        val order = findOrder(orderId)
 
         return OrderMapper.toDto(order)
     }
@@ -86,10 +85,7 @@ class OrderService(
 
     @Transactional
     fun captureOrder(orderId: UUID): OrderDto {
-        val order =
-            orderRepository.findById(orderId).getOrElse {
-                throw NotFoundException("Order with id $orderId not found.")
-            }
+        val order = findOrder(orderId)
 
         ensureCorrectOrderState(order)
 
@@ -108,10 +104,7 @@ class OrderService(
 
     @Transactional
     fun createPayPalOrder(orderId: UUID): PayPalOrderResponse {
-        val order =
-            orderRepository.findById(orderId).getOrElse {
-                throw NotFoundException("Order with id $orderId not found.")
-            }
+        val order = findOrder(orderId)
 
         // Get PayPal information
         val paypalOrderId =
@@ -129,10 +122,7 @@ class OrderService(
         orderId: UUID,
         updates: UpdateOrderDto,
     ): OrderDto {
-        val order =
-            orderRepository.findById(orderId).getOrElse {
-                throw NotFoundException("Order with id $orderId not found.")
-            }
+        val order = findOrder(orderId)
 
         if (order.guestSessionId != updates.guestSessionId) {
             throw ForbiddenException("Invalid session ID.")
@@ -161,6 +151,75 @@ class OrderService(
         return OrderMapper.toDto(order)
     }
 
+    /** Marks an order as "in progress" to show the merchant has started assembling the order. */
+    @Transactional
+    fun confirmOrder(orderId: UUID): ResponseEntity<Void> {
+        val order = findOrder(orderId)
+
+        if (order.status != OrderStatus.PAID) {
+            throw ConflictException(
+                "Order status must be ${OrderStatus.PAID.name} (was ${order.status}).",
+            )
+        }
+
+        order.status = OrderStatus.IN_PROGRESS
+
+        // TODO Send confirmation email to buyer
+
+        return ResponseEntity.ok().build()
+    }
+
+    @Transactional
+    fun cancelOrder(orderId: UUID): ResponseEntity<Void> {
+        val order = findOrder(orderId)
+
+        val nonShippedStatuses =
+            setOf(OrderStatus.AWAITING_PAYMENT, OrderStatus.PAID, OrderStatus.IN_PROGRESS)
+
+        if (order.status !in nonShippedStatuses) {
+            throw ConflictException("Order must not be in shipped state (was ${order.status}).")
+        }
+
+        // TODO Send cancellation email to buyer
+
+        order.status = OrderStatus.CANCELED
+
+        return ResponseEntity.ok().build()
+    }
+
+    /** Marks an order as shipped. Status must be [OrderStatus.IN_PROGRESS]. */
+    @Transactional
+    fun shipOrder(
+        orderId: UUID,
+        trackingDetails: TrackingDetailsDto,
+    ): ResponseEntity<Void> {
+        val order = findOrder(orderId)
+
+        if (order.status != OrderStatus.IN_PROGRESS) {
+            throw ConflictException("Order status must be ${OrderStatus.IN_PROGRESS.name}.")
+        }
+
+        order.status = OrderStatus.SHIPPED
+        order.trackingNumber = trackingDetails.trackingNumber
+        order.shippedAt = OffsetDateTime.now()
+
+        // TODO Send "order shipped" email to buyer
+
+        return ResponseEntity.ok().build()
+    }
+
+    fun fulfillOrder(orderId: UUID): ResponseEntity<Void> {
+        val order = findOrder(orderId)
+
+        if (order.status != OrderStatus.SHIPPED) {
+            throw ConflictException("Order status must be in ${OrderStatus.SHIPPED.name} state.")
+        }
+
+        order.status = OrderStatus.FULFILLED
+
+        return ResponseEntity.ok().build()
+    }
+
     private fun ensureCorrectOrderState(order: Order) {
         // Prevent double-capture
         if (order.status == OrderStatus.PAID) {
@@ -176,4 +235,16 @@ class OrderService(
             error("Order paypalOrderId was null.")
         }
     }
+
+    /**
+     * Retrieves an order entity associated with an ID.
+     *
+     * @param id Order ID
+     * @return Order entity
+     * @throws NotFoundException If no order matches the ID.
+     */
+    private fun findOrder(id: UUID) =
+        orderRepository.findById(id).getOrElse {
+            throw NotFoundException("Order with id $id not found.")
+        }
 }
