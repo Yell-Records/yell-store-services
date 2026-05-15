@@ -23,7 +23,7 @@ images:
   provider: ${IMAGE_PROVIDER:LOCAL}
   upload-dir: ${IMAGE_UPLOAD_DIR:uploads}
   bucket: ${IMAGE_BUCKET:}
-  base-url: ${IMAGE_BASE_URL:}
+  base-url: "${IMAGE_BASE_URL:http://localhost:8080}"
 
 paypal:
   client-id: ${PAYPAL_CLIENT_ID}

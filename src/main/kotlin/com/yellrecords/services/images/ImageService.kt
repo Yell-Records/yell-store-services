@@ -34,7 +34,7 @@ class ImageService(
 
         Files.copy(file.inputStream, target)
 
-        return filename
+        return "${imageConfig.baseUrl}/uploads/$filename"
     }
 
     private fun saveToS3(file: MultipartFile): String {

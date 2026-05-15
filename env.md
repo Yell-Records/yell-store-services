@@ -24,9 +24,9 @@ Default profile.
   - Not needed if `IMAGE_PROVIDER=LOCAL`
   - Currently not used, but will be used for S3 purposes
 - `IMAGE_BASE_URL`
-  - Blank default
+  - Default `http://localhost:8080`
   - Not needed if `IMAGE_PROVIDER=LOCAL`
-  - Currently not used, but will be used for S3 purposes
+  - URL where images are hosted
 - `JWT_SECRET`
   - Default: 5ffSrvavg96EzEcIf04juxRFgA1vudQ7WUOjbO2LgGk
   - Secret to use when generating Java Web Tokens for admins logging in
@@ -39,7 +39,7 @@ Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 - `DB_URL` - Postgres database URL
 - `DB_USERNAME` - Production account username for database
 - `DB_PASSWORD` - Production account password for database
-- `IMAGE_BASE_URL` - _TODO_
+- `IMAGE_BASE_URL` - URL where images are hosted
 - `IMAGE_BUCKET` - _TODO_
 - `IMAGE_PROVIDER` - Should be set to S3, but can be set to LOCAL if needed
 - `IMAGE_UPLOAD_DIR` - Directory for image uploads
