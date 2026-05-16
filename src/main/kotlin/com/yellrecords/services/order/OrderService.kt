@@ -208,6 +208,7 @@ class OrderService(
         return ResponseEntity.ok().build()
     }
 
+    @Transactional
     fun fulfillOrder(orderId: UUID): ResponseEntity<Void> {
         val order = findOrder(orderId)
 
