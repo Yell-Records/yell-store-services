@@ -96,6 +96,8 @@ class OrderService(
         order.status = OrderStatus.PAID
         order.paidAt = OffsetDateTime.now()
 
+        // TODO Send email to merchant alerting of a new order
+
         // Clear the client's cart items
         cartItemService.deleteGuestCartItems(order.guestSessionId)
 
