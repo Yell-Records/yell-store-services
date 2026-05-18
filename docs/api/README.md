@@ -60,6 +60,11 @@ to administrator accounts.
 
 ### Orders
 - [Get orders organized by status](orders/orders-get.md): `GET /api/orders`
+- [Get order by ID](orders/orders-get-id.md): `GET /api/orders/:id`
+- [Set order status to in-progress](orders/orders-patch-confirm.md): `PATCH /api/orders/:id/confirm`
+- [Set order status to shipped](orders/orders-patch-shipped.md): `PATCH /api/orders/:id/shipped`
+- [Set order status to fulfilled](orders/orders-patch-fulfill.md): `PATCH /api/orders/:id/fulfill`
+- [Set order status to canceled](orders/orders-patch-cancel.md): `PATCH /api/orders/:id/cancel`
 
 ### Users
 Endpoints mostly for administrators to manage website access.
