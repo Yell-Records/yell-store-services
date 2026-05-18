@@ -38,3 +38,7 @@ jobs:
 
 jwt:
   secret: ${JWT_SECRET:5ffSrvavg96EzEcIf04juxRFgA1vudQ7WUOjbO2LgGk}
+
+cors:
+  allowed-origins:
+    - http://localhost:4200

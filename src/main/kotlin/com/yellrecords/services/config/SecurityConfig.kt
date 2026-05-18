@@ -2,6 +2,7 @@ package com.yellrecords.services.config
 
 import com.yellrecords.services.auth.CustomUserDetailsService
 import com.yellrecords.services.auth.JwtAuthenticationFilter
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy
@@ -21,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableMethodSecurity(jsr250Enabled = true)
+@EnableConfigurationProperties(CorsProps::class)
 class SecurityConfig {
     @Bean fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
@@ -44,9 +46,9 @@ class SecurityConfig {
         )
 
     @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
+    fun corsConfigurationSource(corsProps: CorsProps): CorsConfigurationSource {
         val config = CorsConfiguration()
-        config.allowedOrigins = listOf("http://localhost:4200")
+        config.allowedOriginPatterns = corsProps.allowedOrigins
         config.allowedMethods = listOf("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
         config.allowedHeaders = listOf("Authorization", "Content-Type")
         config.allowCredentials = true

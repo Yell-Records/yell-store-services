@@ -35,3 +35,7 @@ jobs:
 
 jwt:
   secret: qKbdSQ3bgLRZJWH29euWFYxG2PZrBCEgPQJWPOs0v1P
+
+cors:
+  allowed-origins:
+    - http://localhost:4200

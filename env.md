@@ -35,6 +35,7 @@ Default profile.
 Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 
 ### Required
+- `CORS_ALLOWED_ORIGINS` - List of URLs that can query the application. One should be the web URL of the production server.
 - `DB_URL` - Postgres database URL
 - `DB_USERNAME` - Production account username for database
 - `DB_PASSWORD` - Production account password for database
