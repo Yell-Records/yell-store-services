@@ -41,6 +41,9 @@ Endpoints for purchase orders.
 Closed endpoints require a valid Token to be included in the header request, which is usually only provided
 to administrator accounts.
 
+### Authentication
+- [Change user password](auth/auth-patch-change-password.md): `PATCH /api/auth/user/:id/change-password`
+
 ### Artist Pages
 - [Create new artist page](artist-pages/artist-pages-post.md): `POST /api/artist-pages`
 - [Update artist page](artist-pages/artist-pages-patch-id.md): `PATCH /api/artist-pages/:id`
@@ -60,9 +63,14 @@ to administrator accounts.
 
 ### Orders
 - [Get orders organized by status](orders/orders-get.md): `GET /api/orders`
+- [Get order by ID](orders/orders-get-id.md): `GET /api/orders/:id`
+- [Set order status to in-progress](orders/orders-patch-confirm.md): `PATCH /api/orders/:id/confirm`
+- [Set order status to shipped](orders/orders-patch-shipped.md): `PATCH /api/orders/:id/shipped`
+- [Set order status to fulfilled](orders/orders-patch-fulfill.md): `PATCH /api/orders/:id/fulfill`
+- [Set order status to canceled](orders/orders-patch-cancel.md): `PATCH /api/orders/:id/cancel`
 
 ### Users
 Endpoints mostly for administrators to manage website access.
 - [Get user by ID](users/users-get-id.md): `GET /api/users/:id`
 - [Get current user](users/users-get-me.md): `GET /api/users/me`
-- [Create new user](users/users-post.md): `POST /api/users`
+- [Update user email](users/users-patch-email.md): `PATCH /api/users/:id/email`

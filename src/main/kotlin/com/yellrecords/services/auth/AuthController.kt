@@ -1,12 +1,17 @@
 package com.yellrecords.services.auth
 
+import com.yellrecords.services.auth.dto.ChangePasswordRequest
 import com.yellrecords.services.auth.dto.LoginRequest
 import com.yellrecords.services.auth.dto.LoginResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,4 +26,11 @@ class AuthController(
 
         return ResponseEntity.ok(res)
     }
+
+    @PatchMapping("/user/{id}/change-password")
+    @PreAuthorize("isAuthenticated() && #id == authentication.principal.id")
+    fun changePassword(
+        @PathVariable id: UUID,
+        @RequestBody changeReq: ChangePasswordRequest,
+    ): ResponseEntity<Void> = authService.changePassword(id, changeReq)
 }

@@ -2,6 +2,7 @@ package com.yellrecords.services.order
 
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
+import com.yellrecords.services.order.dto.TrackingDetailsDto
 import com.yellrecords.services.order.dto.UpdateOrderDto
 import com.yellrecords.services.paypal.PayPalOrderResponse
 import com.yellrecords.services.user.UserRole
@@ -29,6 +30,12 @@ class OrderController(
         @RequestParam(required = true) unfinished: Boolean,
     ): List<OrderDto> = orderService.getOrdersForSeller(unfinished)
 
+    @GetMapping("/{id}")
+    @RolesAllowed(UserRole.ADMIN)
+    fun getOrder(
+        @PathVariable id: UUID,
+    ): OrderDto = orderService.getOrder(id)
+
     @PostMapping("/{id}/paypal/create")
     fun createPaypalOrder(
         @PathVariable id: UUID,
@@ -53,4 +60,29 @@ class OrderController(
         @PathVariable id: UUID,
         @RequestBody updateOrderDto: UpdateOrderDto,
     ): OrderDto = orderService.updateOrder(id, updateOrderDto)
+
+    @PatchMapping("/{id}/confirm")
+    @RolesAllowed(UserRole.ADMIN)
+    fun confirmOrder(
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void> = orderService.confirmOrder(id)
+
+    @PatchMapping("/{id}/shipped")
+    @RolesAllowed(UserRole.ADMIN)
+    fun shipOrder(
+        @PathVariable id: UUID,
+        @RequestBody trackingDetails: TrackingDetailsDto,
+    ): ResponseEntity<Void> = orderService.shipOrder(id, trackingDetails)
+
+    @PatchMapping("/{id}/fulfill")
+    @RolesAllowed(UserRole.ADMIN)
+    fun fulfillOrder(
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void> = orderService.fulfillOrder(id)
+
+    @PatchMapping("/{id}/cancel")
+    @RolesAllowed(UserRole.ADMIN)
+    fun cancelOrder(
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void> = orderService.cancelOrder(id)
 }

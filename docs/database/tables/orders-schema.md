@@ -16,31 +16,31 @@
 ## 📄Schema
 - Table name: `orders`
 
-| Column Name            | Datatype                   | Nullable | Default             | Description                                      |
-|------------------------|----------------------------|----------|---------------------|--------------------------------------------------|
-| id                     | PK `UUID`                  | No       | `gen_random_uuid()` | Identifier for the order.                        |
-| buyer_email            | `TEXT`                     | No       |                     | Email for non-user.                              |
-| status                 | `VARCHAR(50)`              | No       | AWAITING_PAYMENT    | Status of the order.                             |
-| total_paid             | `NUMERIC(10,2)`            | Yes      |                     | How much the buyer paid in total.                |
-| created_at             | `TIMESTAMP WITH TIME ZONE` | No       | `now()`             | When the order was made.                         |
-| shipping_first_name    | `TEXT`                     | No       |                     | First Name of the buyer.                         |
-| shipping_last_name     | `TEXT`                     | No       |                     | Last Name of the buyer.                          |
-| shipping_address_line1 | `TEXT`                     | No       |                     | Shipping address details: Street, number, etc.   |
-| shipping_address_line2 | `TEXT`                     | Yes      |                     | Second part of the address, such as Apt 2.       |
-| shipping_city          | `TEXT`                     | No       |                     | City to ship the items to.                       |
-| shipping_state         | `TEXT`                     | No       |                     | U.S. State to ship the items to.                 |
-| shipping_postal_code   | `TEXT`                     | No       |                     | ZIP code of the shipment.                        |
-| shipping_phone         | `TEXT`                     | No       |                     | Phone number associated with the order.          |
-| tracking_number        | `TEXT`                     | Yes      |                     | Tracking number of package.                      |
-| tracking_carrier       | `TEXT`                     | Yes      |                     | Carrier of delivery service for package.         |
-| shipped_at             | `TIMESTAMP WITH TIME ZONE` | Yes      |                     | Date the package was shipped.                    |
-| paypal_order_id        | `TEXT`                     | Yes      |                     | ID of order created through PayPal.              |
-| paypal_capture_id      | `TEXT`                     | Yes      |                     | Capture ID of completed purchase through PayPal. |
-| paid_at                | `TIMESTAMP WITH TIME ZONE` | Yes      |                     | When the order was paid.                         |
-| guest_session_id       | `UUID`                     | No       |                     | Session ID associated with purchase.             |
-| subtotal               | `NUMERIC(10,2)`            | No       |                     | Raw total price of order items in this order.    |
-| tax                    | `NUMERIC(10,2)`            | No       |                     | Tax amount.                                      |
-| shipping_cost          | `NUMERIC(10,2)`            | No       |                     | Shipping price.                                  |
+| Column Name            | Datatype                              | Nullable | Default                   | Description                                      |
+|------------------------|---------------------------------------|----------|---------------------------|--------------------------------------------------|
+| id                     | PK `UUID`                             | No       | `gen_random_uuid()`       | Identifier for the order.                        |
+| buyer_email            | `TEXT`                                | No       |                           | Email for non-user.                              |
+| order_number           | `BIGINT GENERATED ALWAYS AS IDENTITY` | No       | `(START WITH 10482812)`   | Human-friendly order ID.                         |
+| status                 | `VARCHAR(50)`                         | No       | AWAITING_PAYMENT          | Status of the order.                             |
+| total_paid             | `NUMERIC(10,2)`                       | Yes      |                           | How much the buyer paid in total.                |
+| created_at             | `TIMESTAMP WITH TIME ZONE`            | No       | `now()`                   | When the order was made.                         |
+| shipping_first_name    | `TEXT`                                | No       |                           | First Name of the buyer.                         |
+| shipping_last_name     | `TEXT`                                | No       |                           | Last Name of the buyer.                          |
+| shipping_address_line1 | `TEXT`                                | No       |                           | Shipping address details: Street, number, etc.   |
+| shipping_address_line2 | `TEXT`                                | Yes      |                           | Second part of the address, such as Apt 2.       |
+| shipping_city          | `TEXT`                                | No       |                           | City to ship the items to.                       |
+| shipping_state         | `TEXT`                                | No       |                           | U.S. State to ship the items to.                 |
+| shipping_postal_code   | `TEXT`                                | No       |                           | ZIP code of the shipment.                        |
+| shipping_phone         | `TEXT`                                | No       |                           | Phone number associated with the order.          |
+| tracking_number        | `TEXT`                                | Yes      |                           | Tracking number of package.                      |
+| shipped_at             | `TIMESTAMP WITH TIME ZONE`            | Yes      |                           | Date the package was shipped.                    |
+| paypal_order_id        | `TEXT`                                | Yes      |                           | ID of order created through PayPal.              |
+| paypal_capture_id      | `TEXT`                                | Yes      |                           | Capture ID of completed purchase through PayPal. |
+| paid_at                | `TIMESTAMP WITH TIME ZONE`            | Yes      |                           | When the order was paid.                         |
+| guest_session_id       | `UUID`                                | No       |                           | Session ID associated with purchase.             |
+| subtotal               | `NUMERIC(10,2)`                       | No       |                           | Raw total price of order items in this order.    |
+| tax                    | `NUMERIC(10,2)`                       | No       |                           | Tax amount.                                      |
+| shipping_cost          | `NUMERIC(10,2)`                       | No       |                           | Shipping price.                                  |
 
 ## 🎯Purpose
 An **order** entity represents a finalized purchase initiated by a buyer. It captures the high‑level details of a 
@@ -57,11 +57,13 @@ An order is created when a client provides shipping information and proceeds to 
 - The administrators can update order statuses.
 
 ### 🗑️Row Deletion
-Orders with a status of _AWAITING_PAYMENT_ are cleaned up after all the following conditions are met:
-1. Lifetime is three days
-2. `paypal_capture_id` is null (this realistically will never happen as status with this field is usually _PAID_).
+There is an automated cron job called **Stale Order Cleanup** that deletes orders if the following conditions are met:
+1. Order creation is past the set amount of cutoff days
+2. Order status is _AWAITING_PAYMENT_
 
-Otherwise, order entities are never deleted for financial record history.
+Should a user navigate out of checkout after they type in their shipping information, the order becomes stale.
+
+Otherwise, entities should **NEVER** get deleted for financial history.
 
 ## 📌Important Columns
 - `status` -  Current state of the order.
@@ -82,10 +84,12 @@ Otherwise, order entities are never deleted for financial record history.
    4. _SHIPPED_ - Package with items shipped.
    5. _FULFILLED_ - Package was delivered and order is complete.
    6. _CANCELED_ - Order was canceled due to an issue.
+3. `order_number` - Must be unique.
 
 ## 🔍Access Patterns
 - Fetch all in progress orders
 - Fetch all orders not currently in progress
+- Fetch order by ID
 
 ## ⚙️Operational Notes
 None.

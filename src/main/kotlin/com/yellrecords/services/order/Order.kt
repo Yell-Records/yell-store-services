@@ -23,6 +23,8 @@ class Order(
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
     var id: UUID? = null,
+    @Column(name = "order_number", insertable = false, updatable = false)
+    var orderNumber: Long? = null,
     @Column(name = "buyer_email") var buyerEmail: String,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -43,7 +45,6 @@ class Order(
     @Column(name = "shipping_phone", nullable = false) var shippingPhone: String,
     @Column(name = "paid_at") var paidAt: OffsetDateTime? = null,
     @Column(name = "tracking_number") var trackingNumber: String? = null,
-    @Column(name = "tracking_carrier") var trackingCarrier: String? = null,
     @Column(name = "shipped_at") var shippedAt: OffsetDateTime? = null,
     @Column(name = "paypal_order_id") var paypalOrderId: String? = null,
     @Column(name = "paypal_capture_id") var paypalCaptureId: String? = null,
