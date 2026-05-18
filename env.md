@@ -25,7 +25,6 @@ Default profile.
   - Currently not used, but will be used for S3 purposes
 - `IMAGE_BASE_URL`
   - Default `http://localhost:8080`
-  - Not needed if `IMAGE_PROVIDER=LOCAL`
   - URL where images are hosted
 - `JWT_SECRET`
   - Default: 5ffSrvavg96EzEcIf04juxRFgA1vudQ7WUOjbO2LgGk
@@ -40,8 +39,8 @@ Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 - `DB_USERNAME` - Production account username for database
 - `DB_PASSWORD` - Production account password for database
 - `IMAGE_BASE_URL` - URL where images are hosted
-- `IMAGE_BUCKET` - _TODO_
-- `IMAGE_PROVIDER` - Should be set to S3, but can be set to LOCAL if needed
+- `IMAGE_BUCKET` - _TODO: S3_
+- `IMAGE_PROVIDER` - Should be set to S3, but can be set to LOCAL if needed (not recommended)
 - `IMAGE_UPLOAD_DIR` - Directory for image uploads
 - `JWT_SECRET` - 256-bit encryption secret for generating Java Web Tokens
 - `PAYPAL_CLIENT_ID` - Client ID for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
