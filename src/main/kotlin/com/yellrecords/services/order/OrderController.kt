@@ -85,4 +85,10 @@ class OrderController(
     fun cancelOrder(
         @PathVariable id: UUID,
     ): ResponseEntity<Void> = orderService.cancelOrder(id)
+
+    @PatchMapping("/{id}/anonymize")
+    @RolesAllowed(UserRole.ADMIN)
+    fun anonymizeOrder(
+        @PathVariable id: UUID,
+    ): ResponseEntity<OrderDto> = orderService.anonymizeOrder(id)
 }

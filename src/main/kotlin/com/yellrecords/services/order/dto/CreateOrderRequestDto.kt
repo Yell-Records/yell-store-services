@@ -16,4 +16,5 @@ data class CreateOrderRequestDto(
     val shippingState: String,
     val shippingPostalCode: String,
     val shippingPhone: String,
+    val acceptedTerms: Boolean,
 )

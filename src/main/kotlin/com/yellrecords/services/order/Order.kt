@@ -49,6 +49,9 @@ class Order(
     @Column(name = "paypal_order_id") var paypalOrderId: String? = null,
     @Column(name = "paypal_capture_id") var paypalCaptureId: String? = null,
     @Column(name = "guest_session_id", nullable = false) var guestSessionId: UUID,
+    @Column(name = "policies_accepted_at", nullable = false) var policiesAcceptedAt: OffsetDateTime,
+    @Column(nullable = false) var anonymized: Boolean = false,
+    @Column(name = "anonymized_at") var anonymizedAt: OffsetDateTime? = null,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     var orderItems: MutableList<OrderItem> = mutableListOf(),
 )

@@ -28,4 +28,7 @@ data class OrderDto(
     val trackingNumber: String?,
     val paidAt: OffsetDateTime?,
     val shippedAt: OffsetDateTime?,
+    val policiesAcceptedAt: OffsetDateTime,
+    val anonymized: Boolean,
+    val anonymizedAt: OffsetDateTime?,
 )
