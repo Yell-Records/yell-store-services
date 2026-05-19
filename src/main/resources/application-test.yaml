@@ -16,6 +16,18 @@ spring:
     placeholders:
       emailCheck: "1=1"
 
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
 images:
   provider: LOCAL
   upload-dir: uploads
