@@ -30,6 +30,9 @@ paypal:
   client-secret: ${PAYPAL_CLIENT_SECRET}
   mode: live
 
+policies:
+  path: ${POLICIES_PATH}
+
 jobs:
   stale-order-cleanup:
     enabled: ${JOB_STALE_ORDERS_ENABLED:true}
