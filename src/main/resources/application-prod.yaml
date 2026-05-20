@@ -35,6 +35,10 @@ jobs:
     enabled: ${JOB_STALE_ORDERS_ENABLED:true}
     cutoff-days: ${JOB_STALE_ORDERS_CUTOFF_DAYS:3}
     cron: "${JOB_STALE_ORDERS_CRON:0 0 2 * * *}"
+  cart-item-cleanup:
+    enabled: ${JOB_CART_CLEANUP_ENABLED:true}
+    cutoff-days: ${JOB_CART_CLEANUP_CUTOFF_DAYS:3}
+    cron: "${JOB_CART_CLEANUP_CRON:0 0 2 * * *}"
 
 jwt:
   secret: ${JWT_SECRET}
