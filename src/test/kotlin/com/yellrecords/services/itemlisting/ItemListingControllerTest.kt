@@ -1,21 +1,25 @@
 package com.yellrecords.services.itemlisting
 
 import com.yellrecords.services.BaseH2Test
+import com.yellrecords.services.cart.CartItem
+import com.yellrecords.services.cart.CartItemRepository
 import com.yellrecords.services.category.Category
 import com.yellrecords.services.itemlisting.dto.CreateListingRequest
 import com.yellrecords.services.itemlisting.dto.ItemListingDto
 import com.yellrecords.services.itemlisting.dto.UpdateListingRequest
 import io.kotest.inspectors.forAll
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
@@ -28,6 +32,8 @@ class ItemListingControllerTest : BaseH2Test() {
 
     private lateinit var listing1: ItemListing
     private lateinit var listing2: ItemListing
+
+    @Autowired lateinit var cartItemRepository: CartItemRepository
 
     @BeforeEach
     fun initializeListings() {
@@ -77,24 +83,76 @@ class ItemListingControllerTest : BaseH2Test() {
 
     @Nested
     inner class GetItemListing {
+        @BeforeEach
+        fun initInactive() {
+            val inactive =
+                ItemListing(
+                    categoryId = categoryRepository.findCategoryBySlug("sample-category")!!.id!!,
+                    title = "Inactive Listing",
+                    price = BigDecimal("10.00"),
+                    isActive = false,
+                )
+
+            itemListingRepository.save(inactive)
+        }
+
         @Test
-        fun `should get all item listings`() {
-            mockRequest(requestType = GET, path = BASE_PATH, token = null)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.length()").value(2))
+        fun `should get only active item listings`() {
+            val results =
+                mockRequest(requestType = GET, path = BASE_PATH, token = null)
+                    .andExpect(status().isOk)
+                    .andReturn()
+
+            val body = results.response.contentAsString
+            val listings = objectMapper.readValue<List<ItemListingDto>>(body)
+
+            listings.shouldNotBeEmpty()
+            listings.forAll { it.isActive shouldBe true }
+        }
+
+        @Test
+        fun `should return 403 forbidden when retrieving all item listings with no token`() {
+            mockRequest(requestType = GET, path = "$BASE_PATH/all", token = null)
+                .andExpect(status().isForbidden)
+        }
+
+        @Test
+        fun `should get every item listing`() {
+            val results =
+                mockRequest(requestType = GET, path = "$BASE_PATH/all", token = TestTokens.admin)
+                    .andExpect(status().isOk)
+                    .andReturn()
+
+            val body = results.response.contentAsString
+            val listings = objectMapper.readValue<List<ItemListingDto>>(body)
+
+            val allListings = itemListingRepository.findAll().toList()
+            listings shouldHaveSize allListings.size
         }
 
         @Test
         fun `should get single item listing by id`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/${listing1.id}", token = null)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id").value(listing1.id.toString()))
+            val result =
+                mockRequest(
+                    requestType = GET,
+                    path = "$BASE_PATH/listing/${listing1.id}",
+                    token = null,
+                ).andExpect(status().isOk)
+                    .andReturn()
+
+            val body = result.response.contentAsString
+            val listing = objectMapper.readValue<ItemListingDto>(body)
+
+            listing.id shouldBe listing1.id
         }
 
         @Test
         fun `should return 404 not found on unknown listing id`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/${UUID.randomUUID()}", token = null)
-                .andExpect(status().isNotFound)
+            mockRequest(
+                requestType = GET,
+                path = "$BASE_PATH/listing/${UUID.randomUUID()}",
+                token = null,
+            ).andExpect(status().isNotFound)
         }
 
         @Nested
@@ -202,6 +260,29 @@ class ItemListingControllerTest : BaseH2Test() {
                 token = TestTokens.admin,
                 body = UpdateListingRequest(price = BigDecimal(-1)),
             ).andExpect(status().isBadRequest)
+        }
+
+        @Test
+        fun `should clear associated cart items when setting item listing as inactive`() {
+            val cartItem1 = CartItem(guestSessionId = UUID.randomUUID(), listingId = listing1.id!!)
+
+            val cartItem2 = CartItem(guestSessionId = UUID.randomUUID(), listingId = listing1.id!!)
+
+            val cartItem3 =
+                CartItem(guestSessionId = cartItem1.guestSessionId, listingId = listing2.id!!)
+
+            cartItemRepository.saveAll(listOf(cartItem1, cartItem2, cartItem3))
+
+            mockRequest(
+                requestType = PATCH,
+                path = "$BASE_PATH/${listing1.id}",
+                token = TestTokens.admin,
+                body = UpdateListingRequest(isActive = false),
+            ).andExpect(status().isOk)
+
+            val cartItems = cartItemRepository.findAll().toList()
+            cartItems.shouldNotBeEmpty()
+            cartItems.forAll { it.listingId shouldNotBe listing1.id }
         }
     }
 }

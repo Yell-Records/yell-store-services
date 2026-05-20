@@ -17,6 +17,8 @@ interface CartItemRepository : JpaRepository<CartItem, UUID> {
 
     fun deleteCartItemsByGuestSessionId(guestSessionId: UUID)
 
+    fun deleteCartItemsByListingId(listingId: UUID)
+
     @Modifying
     @Query(
         """
