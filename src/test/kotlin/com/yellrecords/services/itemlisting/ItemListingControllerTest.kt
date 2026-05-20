@@ -6,6 +6,7 @@ import com.yellrecords.services.itemlisting.dto.CreateListingRequest
 import com.yellrecords.services.itemlisting.dto.ItemListingDto
 import com.yellrecords.services.itemlisting.dto.UpdateListingRequest
 import io.kotest.inspectors.forAll
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
@@ -77,18 +77,67 @@ class ItemListingControllerTest : BaseH2Test() {
 
     @Nested
     inner class GetItemListing {
+        @BeforeEach
+        fun initInactive() {
+            val inactive =
+                ItemListing(
+                    categoryId = categoryRepository.findCategoryBySlug("sample-category")!!.id!!,
+                    title = "Inactive Listing",
+                    price = BigDecimal("10.00"),
+                    isActive = false,
+                )
+
+            itemListingRepository.save(inactive)
+        }
+
         @Test
-        fun `should get all item listings`() {
-            mockRequest(requestType = GET, path = BASE_PATH, token = null)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.length()").value(2))
+        fun `should get only active item listings`() {
+            val results =
+                mockRequest(requestType = GET, path = BASE_PATH, token = null)
+                    .andExpect(status().isOk)
+                    .andReturn()
+
+            val body = results.response.contentAsString
+            val listings = objectMapper.readValue<List<ItemListingDto>>(body)
+
+            listings.shouldNotBeEmpty()
+            listings.forAll { it.isActive shouldBe true }
+        }
+
+        @Test
+        fun `should return 403 forbidden when retrieving all item listings with no token`() {
+            mockRequest(requestType = GET, path = "$BASE_PATH/all", token = null)
+                .andExpect(status().isForbidden)
+        }
+
+        @Test
+        fun `should get every item listing`() {
+            val results =
+                mockRequest(requestType = GET, path = "$BASE_PATH/all", token = TestTokens.admin)
+                    .andExpect(status().isOk)
+                    .andReturn()
+
+            val body = results.response.contentAsString
+            val listings = objectMapper.readValue<List<ItemListingDto>>(body)
+
+            val allListings = itemListingRepository.findAll().toList()
+            listings shouldHaveSize allListings.size
         }
 
         @Test
         fun `should get single item listing by id`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/listing/${listing1.id}", token = null)
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id").value(listing1.id.toString()))
+            val result =
+                mockRequest(
+                    requestType = GET,
+                    path = "$BASE_PATH/listing/${listing1.id}",
+                    token = null,
+                ).andExpect(status().isOk)
+                    .andReturn()
+
+            val body = result.response.contentAsString
+            val listing = objectMapper.readValue<ItemListingDto>(body)
+
+            listing.id shouldBe listing1.id
         }
 
         @Test
