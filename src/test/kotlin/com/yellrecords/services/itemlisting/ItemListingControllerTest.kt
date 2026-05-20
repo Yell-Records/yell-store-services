@@ -1,6 +1,8 @@
 package com.yellrecords.services.itemlisting
 
 import com.yellrecords.services.BaseH2Test
+import com.yellrecords.services.cart.CartItem
+import com.yellrecords.services.cart.CartItemRepository
 import com.yellrecords.services.category.Category
 import com.yellrecords.services.itemlisting.dto.CreateListingRequest
 import com.yellrecords.services.itemlisting.dto.ItemListingDto
@@ -10,9 +12,11 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
@@ -28,6 +32,8 @@ class ItemListingControllerTest : BaseH2Test() {
 
     private lateinit var listing1: ItemListing
     private lateinit var listing2: ItemListing
+
+    @Autowired lateinit var cartItemRepository: CartItemRepository
 
     @BeforeEach
     fun initializeListings() {
@@ -254,6 +260,29 @@ class ItemListingControllerTest : BaseH2Test() {
                 token = TestTokens.admin,
                 body = UpdateListingRequest(price = BigDecimal(-1)),
             ).andExpect(status().isBadRequest)
+        }
+
+        @Test
+        fun `should clear associated cart items when setting item listing as inactive`() {
+            val cartItem1 = CartItem(guestSessionId = UUID.randomUUID(), listingId = listing1.id!!)
+
+            val cartItem2 = CartItem(guestSessionId = UUID.randomUUID(), listingId = listing1.id!!)
+
+            val cartItem3 =
+                CartItem(guestSessionId = cartItem1.guestSessionId, listingId = listing2.id!!)
+
+            cartItemRepository.saveAll(listOf(cartItem1, cartItem2, cartItem3))
+
+            mockRequest(
+                requestType = PATCH,
+                path = "$BASE_PATH/${listing1.id}",
+                token = TestTokens.admin,
+                body = UpdateListingRequest(isActive = false),
+            ).andExpect(status().isOk)
+
+            val cartItems = cartItemRepository.findAll().toList()
+            cartItems.shouldNotBeEmpty()
+            cartItems.forAll { it.listingId shouldNotBe listing1.id }
         }
     }
 }
