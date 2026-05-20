@@ -86,15 +86,18 @@ class ItemListingControllerTest : BaseH2Test() {
 
         @Test
         fun `should get single item listing by id`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/${listing1.id}", token = null)
+            mockRequest(requestType = GET, path = "$BASE_PATH/listing/${listing1.id}", token = null)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(listing1.id.toString()))
         }
 
         @Test
         fun `should return 404 not found on unknown listing id`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/${UUID.randomUUID()}", token = null)
-                .andExpect(status().isNotFound)
+            mockRequest(
+                requestType = GET,
+                path = "$BASE_PATH/listing/${UUID.randomUUID()}",
+                token = null,
+            ).andExpect(status().isNotFound)
         }
 
         @Nested
