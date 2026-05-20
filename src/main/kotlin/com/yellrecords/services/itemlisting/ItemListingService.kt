@@ -1,5 +1,6 @@
 package com.yellrecords.services.itemlisting
 
+import com.yellrecords.services.cart.CartItemRepository
 import com.yellrecords.services.category.CategoryRepository
 import com.yellrecords.services.exception.BadRequestException
 import com.yellrecords.services.exception.NotFoundException
@@ -19,10 +20,17 @@ import kotlin.jvm.optionals.getOrElse
 class ItemListingService(
     private val itemListingRepo: ItemListingRepository,
     private val categoryRepository: CategoryRepository,
+    private val cartItemRepository: CartItemRepository,
 ) {
-    /** Retrieves every item listing in the database. */
+    /** Gets ALL listings. */
     fun getAllListings(): List<ItemListingDto> =
         itemListingRepo.findAll().map { listing ->
+            ItemListingMapper.toDto(listing, listing.category())
+        }
+
+    /** Retrieves every active item listing. */
+    fun getActiveListings(): List<ItemListingDto> =
+        itemListingRepo.findAllActive().map { listing ->
             ItemListingMapper.toDto(listing, listing.category())
         }
 
@@ -91,6 +99,12 @@ class ItemListingService(
         }
         req.isActive?.let {
             listing.isActive = it
+
+            if (!listing.isActive) {
+                // Clear any cart items that currently hold this listing
+                cartItemRepository.deleteCartItemsByListingId(listing.id!!)
+            }
+
             updated = true
         }
         req.categorySlug?.let { slug ->
