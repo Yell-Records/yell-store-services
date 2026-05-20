@@ -5,9 +5,9 @@ Retrieves every item listing.
 
 **Method**: `GET`
 
-**Auth required**: NO
+**Auth required**: YES
 
-**Permissions required**: None
+**Permissions required**: Admin
 
 ## Success Response
 **Condition**: Always.
