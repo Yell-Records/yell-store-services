@@ -63,3 +63,17 @@ orders.
   - Default `0 0 2 * * *` (every day at 2am)
   - [Cron expression](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/scheduling/support/CronExpression.html)
     for when this job should run.
+
+#### Cart item cleanup job
+This scheduled job purges cart items associated with a guest session ID if the **maximum** timestamp date on one of
+the cart items goes beyond the cutoff date. It ensures all cart item entities are not stale.
+- `JOB_CART_CLEANUP_ENABLED`
+  - Default `true`
+  - If this job should run.
+- `JOB_CART_CLEANUP_CUTOFF_DAYS`
+  - Default 3
+  - The amount of days cart item timestamps must be younger than to be considered stale.
+- `JOB_CART_CLEANUP_CRON`
+  - Default `0 0 2 * * *` (every day at 2am)
+  - [Cron expression](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/scheduling/support/CronExpression.html)
+    for when this job should run.
