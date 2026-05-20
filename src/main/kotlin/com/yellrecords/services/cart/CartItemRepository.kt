@@ -36,7 +36,7 @@ interface CartItemRepository : JpaRepository<CartItem, UUID> {
             WHERE ci.guestSessionId IN (
                 SELECT ci2.guestSessionId FROM CartItem ci2
                 GROUP BY ci2.guestSessionId
-                HAVING MAX(ci2.updatedAt) < :cutoff
+                HAVING MAX(ci2.updatedAt) <= :cutoff
             )
         """,
     )
