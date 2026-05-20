@@ -6,6 +6,7 @@ import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
 import com.yellrecords.services.util.ShippingUtil
 import com.yellrecords.services.util.TaxUtil
+import java.time.OffsetDateTime
 
 object OrderMapper {
     fun toDto(entity: Order) =
@@ -31,22 +32,28 @@ object OrderMapper {
             orderItems = entity.orderItems.map { OrderItemMapper.toDto(it) },
             shippedAt = entity.shippedAt,
             paidAt = entity.paidAt,
+            policiesAcceptedAt = entity.policiesAcceptedAt,
+            anonymized = entity.anonymized,
+            anonymizedAt = entity.anonymizedAt,
         )
 
-    fun asNewEntity(dto: CreateOrderRequestDto) =
-        Order(
-            guestSessionId = dto.guestSessionId,
-            buyerEmail = dto.buyerEmail,
-            subtotal = dto.subtotal,
-            tax = TaxUtil.calculateTax(dto.shippingState, dto.subtotal),
-            shippingCost = ShippingUtil.FLAT_SHIPPING_COST,
-            shippingFirstName = dto.shippingFirstName,
-            shippingLastName = dto.shippingLastName,
-            shippingAddressLine1 = dto.shippingAddressLine1,
-            shippingAddressLine2 = dto.shippingAddressLine2,
-            shippingCity = dto.shippingCity,
-            shippingState = dto.shippingState,
-            shippingPostalCode = dto.shippingPostalCode,
-            shippingPhone = dto.shippingPhone,
-        )
+    fun asNewEntity(
+        dto: CreateOrderRequestDto,
+        policyTz: OffsetDateTime,
+    ) = Order(
+        guestSessionId = dto.guestSessionId,
+        buyerEmail = dto.buyerEmail,
+        subtotal = dto.subtotal,
+        tax = TaxUtil.calculateTax(dto.shippingState, dto.subtotal),
+        shippingCost = ShippingUtil.FLAT_SHIPPING_COST,
+        shippingFirstName = dto.shippingFirstName,
+        shippingLastName = dto.shippingLastName,
+        shippingAddressLine1 = dto.shippingAddressLine1,
+        shippingAddressLine2 = dto.shippingAddressLine2,
+        shippingCity = dto.shippingCity,
+        shippingState = dto.shippingState,
+        shippingPostalCode = dto.shippingPostalCode,
+        shippingPhone = dto.shippingPhone,
+        policiesAcceptedAt = policyTz,
+    )
 }

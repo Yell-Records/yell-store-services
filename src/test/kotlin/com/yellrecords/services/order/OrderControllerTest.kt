@@ -73,6 +73,7 @@ class OrderControllerTest : BaseH2Test() {
         shippingState = "New York",
         shippingPostalCode = "55555",
         shippingPhone = "555-555-5555",
+        acceptedTerms = true,
     )
 
     @BeforeEach
@@ -499,6 +500,70 @@ class OrderControllerTest : BaseH2Test() {
                         updatedOrder.status shouldBe OrderStatus.CANCELED
                     }
                 }
+            }
+        }
+
+        @Nested
+        inner class AnonymizeOrder {
+            @Test
+            fun `should return 403 forbidden when anonymizing without token`() {
+                mockRequest(
+                    requestType = PATCH,
+                    path = "$BASE_PATH/${guestOrder.id}/anonymize",
+                    token = null,
+                ).andExpect(status().isForbidden)
+            }
+
+            @Test
+            fun `should return 409 conflict when order state is pre-shipped`() {
+                guestOrder.status = OrderStatus.IN_PROGRESS
+
+                orderRepository.save(guestOrder)
+
+                mockRequest(
+                    requestType = PATCH,
+                    path = "$BASE_PATH/${guestOrder.id}/anonymize",
+                    token = TestTokens.admin,
+                ).andExpect(status().isConflict)
+            }
+
+            @Test
+            fun `should anonymize order`() {
+                guestOrder.status = OrderStatus.FULFILLED
+
+                orderRepository.save(guestOrder)
+
+                val result =
+                    mockRequest(
+                        requestType = PATCH,
+                        path = "$BASE_PATH/${guestOrder.id}/anonymize",
+                        token = TestTokens.admin,
+                    ).andExpect(status().isOk)
+                        .andReturn()
+
+                val body = result.response.contentAsString
+                val order = objectMapper.readValue<OrderDto>(body)
+
+                order.shippingFirstname shouldBe "Deleted"
+                order.shippingLastname shouldBe "User"
+                order.shippingAddressLine1 shouldBe "Anonymized"
+                order.shippingAddressLine2 shouldBe null
+                order.buyerEmail shouldBe "deleted+${guestOrder.orderNumber}@example.com"
+                order.shippingCity shouldBe "Anonymized"
+                order.shippingPhone shouldBe "0000000000"
+                order.shippingPostalCode shouldBe "00000"
+                order.anonymized shouldBe true
+                order.anonymizedAt.shouldNotBeNull()
+
+                // Should not anonymize shipping state
+                order.shippingState shouldBe guestOrder.shippingState
+
+                // Test for no content
+                mockRequest(
+                    requestType = PATCH,
+                    path = "$BASE_PATH/${guestOrder.id}/anonymize",
+                    token = TestTokens.admin,
+                ).andExpect(status().isNoContent)
             }
         }
     }

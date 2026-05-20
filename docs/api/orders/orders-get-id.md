@@ -21,6 +21,7 @@ Retrieves an order entity by its ID.
 {
   "id": "b81f19e1-e291-40a0-b17e-ba7740d93efe",
   "buyerEmail": "user@test.com",
+  "orderNumber": 10482812,
   "status": "IN_PROGRESS",
   "subtotal": 30.23,
   "tax": 1.0,
@@ -47,9 +48,11 @@ Retrieves an order entity by its ID.
     }
   ],
   "trackingNumber": null,
-  "trackingCarrier": null,
   "paidAt": "2026-05-05T22:00:00Z",
-  "shippedAt": null
+  "shippedAt": null,
+  "policiesAcceptedAt": "2026-05-05T22:00:00Z",
+  "anonymized": false,
+  "anonymizedAt": null
 }
 ```
 
