@@ -21,14 +21,18 @@ import java.util.UUID
 class ItemListingController(
     private val service: ItemListingService,
 ) {
-    @GetMapping fun getItemListings(): List<ItemListingDto> = service.getAllListings()
+    @GetMapping fun getActiveListings(): List<ItemListingDto> = service.getActiveListings()
+
+    @GetMapping("/all")
+    @RolesAllowed(UserRole.ADMIN)
+    fun getAllListings(): List<ItemListingDto> = service.getAllListings()
 
     @GetMapping("/category/{slug}")
     fun getItemsByCategory(
         @PathVariable slug: String,
     ): List<ItemListingDto> = service.getListingsByCategorySlug(slug)
 
-    @GetMapping("/{listingId}")
+    @GetMapping("/listing/{listingId}")
     fun getItemListing(
         @PathVariable listingId: UUID,
     ): ItemListingDto = service.getListingById(listingId)

@@ -1,7 +1,7 @@
-# Get all Active Item Listings
-Retrieves every item listing currently marked as active.
+# Get all Item Listings
+Retrieves every item listing.
 
-**URL**: `/api/item-listings`
+**URL**: `/api/item-listings/all`
 
 **Method**: `GET`
 
