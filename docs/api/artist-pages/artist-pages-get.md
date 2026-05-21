@@ -22,7 +22,6 @@ Retrieves every artist page.
     "slug": "floyd-cramer",
     "name": "Floyd Cramer",
     "bodyHtml": "<h1>Floyd Cramer</h1><p>Floyd Cramer left an important mark on music</p>",
-    "youtubeUrls": ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
     "categoryId": "0e91cef8-2fa7-4b1a-94c1-c02b969289a4",
     "createdAt": "2026-05-05T22:00:00Z",
     "updatedAt": "2026-05-05T22:00:00Z"
