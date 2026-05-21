@@ -10,6 +10,7 @@ import com.yellrecords.services.exception.ConflictException
 import com.yellrecords.services.exception.NotFoundException
 import com.yellrecords.services.util.HtmlUtil
 import com.yellrecords.services.util.SLUG_REGEX
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -75,7 +76,7 @@ class ArtistPageService(
     fun updateArtistPage(
         pageId: UUID,
         updateReq: UpdateArtistPageDto,
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<ArtistPageDto> {
         val artistPage =
             artistPageRepository.findById(pageId).getOrElse {
                 throw NotFoundException("Could not find artist page with id $pageId.")
@@ -112,12 +113,19 @@ class ArtistPageService(
             updated = true
         }
 
+        val category =
+            categoryRepository.findById(artistPage.categoryId).getOrElse {
+                throw NotFoundException("Could not find category with id ${artistPage.categoryId}")
+            }
+
+        val dto = ArtistPageMapper.toDto(artistPage, category.slug)
+
         return if (updated) {
             artistPage.updatedAt = OffsetDateTime.now()
 
-            ResponseEntity.ok().build()
+            ResponseEntity(dto, HttpStatus.OK)
         } else {
-            ResponseEntity.noContent().build()
+            ResponseEntity(dto, HttpStatus.NO_CONTENT)
         }
     }
 

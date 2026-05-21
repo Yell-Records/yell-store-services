@@ -44,7 +44,7 @@ class ArtistPageController(
     fun updateArtistPage(
         @PathVariable id: UUID,
         @RequestBody req: UpdateArtistPageDto,
-    ): ResponseEntity<Void> = artistPageService.updateArtistPage(id, req)
+    ): ResponseEntity<ArtistPageDto> = artistPageService.updateArtistPage(id, req)
 
     @DeleteMapping("/{id}")
     @RolesAllowed(UserRole.ADMIN)
