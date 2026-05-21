@@ -22,7 +22,6 @@
 | slug         | `TEXT`                     | No       |                     | URL slug for the page.                                       |
 | name         | `TEXT`                     | No       |                     | Name of the artist.                                          |
 | body_html    | `TEXT`                     | No       |                     | Page HTML.                                                   |
-| youtube_urls | `TEXT[]`                   | No       | {}                  | List of YouTube links that will be displayed on the page.    |
 | category_id  | FK `UUID`                  | No       |                     | Category ID. Displays items on the page under this category. |
 | created_at   | `TIMESTAMP WITH TIME ZONE` | No       | `now()`             |                                                              |
 | updated_at   | `TIMESTAMP WITH TIME ZONE` | No       | `now()`             |                                                              |
