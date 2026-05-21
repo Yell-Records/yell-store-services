@@ -8,6 +8,7 @@ import com.yellrecords.services.category.CategoryRepository
 import com.yellrecords.services.exception.BadRequestException
 import com.yellrecords.services.exception.ConflictException
 import com.yellrecords.services.exception.NotFoundException
+import com.yellrecords.services.util.HtmlUtil
 import com.yellrecords.services.util.SLUG_REGEX
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -26,10 +27,23 @@ class ArtistPageService(
             artistPageRepository.findArtistPageBySlug(slug)
                 ?: throw NotFoundException("Could not find artist page with slug $slug")
 
-        return ArtistPageMapper.toDto(page)
+        val category =
+            categoryRepository.findById(page.categoryId).getOrElse {
+                throw NotFoundException("Could not find category with id ${page.categoryId}")
+            }
+
+        return ArtistPageMapper.toDto(page, category.slug)
     }
 
-    fun getArtistPages() = artistPageRepository.findAll().map { ArtistPageMapper.toDto(it) }
+    fun getArtistPages() =
+        artistPageRepository.findAllSortedByName().map { page ->
+            val category =
+                categoryRepository.findById(page.categoryId).getOrElse {
+                    throw NotFoundException("Could not find category with id ${page.categoryId}")
+                }
+
+            ArtistPageMapper.toDto(page, category.slug)
+        }
 
     fun createArtistPage(request: CreateArtistPageDto): ArtistPageDto {
         val slug = request.slug.lowercase()
@@ -42,18 +56,19 @@ class ArtistPageService(
                     "Could not find category with slug ${request.categorySlug}.",
                 )
 
+        val cleanHtml = HtmlUtil.cleanHtml(request.bodyHtml)
+
         val entity =
             ArtistPage(
                 slug = slug,
                 name = request.name,
-                bodyHtml = request.bodyHtml,
+                bodyHtml = cleanHtml,
                 categoryId = category.id!!,
-                youtubeUrls = request.youtubeUrls,
             )
 
         val saved = artistPageRepository.save(entity)
 
-        return ArtistPageMapper.toDto(saved)
+        return ArtistPageMapper.toDto(saved, category.slug)
     }
 
     @Transactional
@@ -83,12 +98,8 @@ class ArtistPageService(
         }
 
         updateReq.bodyHtml?.let {
-            artistPage.bodyHtml = it
-            updated = true
-        }
+            artistPage.bodyHtml = HtmlUtil.cleanHtml(it)
 
-        updateReq.youtubeUrls?.let {
-            artistPage.youtubeUrls = it
             updated = true
         }
 

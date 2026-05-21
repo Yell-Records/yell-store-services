@@ -1,6 +1,7 @@
 package com.yellrecords.services.policies
 
 import com.yellrecords.services.config.PolicyDocsProperties
+import com.yellrecords.services.util.HtmlUtil
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -21,6 +22,8 @@ class PolicyService(
     ) {
         val path = Paths.get(policyDocsProperties.path, filename)
 
-        Files.writeString(path, content)
+        val cleanContent = HtmlUtil.cleanHtml(content)
+
+        Files.writeString(path, cleanContent)
     }
 }
