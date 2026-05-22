@@ -51,6 +51,14 @@ class OrderService(
         return OrderMapper.toDto(order)
     }
 
+    fun getOrderByOrderNumber(orderNumber: Long): OrderDto {
+        val order =
+            orderRepository.findOrderByOrderNumber(orderNumber)
+                ?: throw NotFoundException("Order number not found: $orderNumber")
+
+        return OrderMapper.toDto(order)
+    }
+
     /**
      * Saves a new order and its items to the database using the buyer's associated cart items.
      *
