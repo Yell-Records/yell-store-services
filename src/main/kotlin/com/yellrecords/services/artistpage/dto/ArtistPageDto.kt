@@ -8,8 +8,7 @@ data class ArtistPageDto(
     val slug: String,
     val name: String,
     val bodyHtml: String,
-    val youtubeUrls: List<String>,
-    val categoryId: UUID,
+    val categorySlug: String,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
 )

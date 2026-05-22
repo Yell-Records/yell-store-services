@@ -49,7 +49,6 @@ class ArtistPageControllerTest : BaseH2Test() {
                     slug = "test-artist",
                     bodyHtml = "<p><b>Test Artist</b></p>",
                     categorySlug = sampleCategory.slug,
-                    youtubeUrls = emptyList(),
                 )
         }
 
