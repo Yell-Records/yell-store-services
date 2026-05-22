@@ -65,6 +65,7 @@ to administrator accounts.
 ### Orders
 - [Get orders organized by status](orders/orders-get.md): `GET /api/orders`
 - [Get order by ID](orders/orders-get-id.md): `GET /api/orders/:id`
+- [Get order by order number](orders/orders-get-order-number.md): `GET /api/orders/order-number/:orderNumber`
 - [Set order status to in-progress](orders/orders-patch-confirm.md): `PATCH /api/orders/:id/confirm`
 - [Set order status to shipped](orders/orders-patch-shipped.md): `PATCH /api/orders/:id/shipped`
 - [Set order status to fulfilled](orders/orders-patch-fulfill.md): `PATCH /api/orders/:id/fulfill`

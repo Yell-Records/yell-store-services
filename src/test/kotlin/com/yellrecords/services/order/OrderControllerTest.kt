@@ -224,6 +224,35 @@ class OrderControllerTest : BaseH2Test() {
         }
 
         @Test
+        fun `should return 403 forbidden when retrieving order by order number`() {
+            val sampleOrder = orderRepository.findAll().first()
+
+            mockRequest(
+                requestType = GET,
+                path = "$BASE_PATH/order-number/${sampleOrder.orderNumber}",
+                token = null,
+            ).andExpect(status().isForbidden)
+        }
+
+        @Test
+        fun `should get order by order number`() {
+            val sampleOrder = orderRepository.findAll().first()
+
+            val result =
+                mockRequest(
+                    requestType = GET,
+                    path = "$BASE_PATH/order-number/${sampleOrder.orderNumber}",
+                    token = TestTokens.admin,
+                ).andExpect(status().isOk)
+                    .andReturn()
+
+            val body = result.response.contentAsString
+            val order = objectMapper.readValue<OrderDto>(body)
+
+            order.orderNumber shouldBe sampleOrder.orderNumber
+        }
+
+        @Test
         fun `should get order by id`() {
             val sampleOrder = orderRepository.findAll().first()
 
