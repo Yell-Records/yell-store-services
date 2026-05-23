@@ -5,7 +5,7 @@ import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
 import com.yellrecords.services.util.ShippingUtil
-import com.yellrecords.services.util.TaxUtil
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 
 object OrderMapper {
@@ -44,7 +44,7 @@ object OrderMapper {
         guestSessionId = dto.guestSessionId,
         buyerEmail = dto.buyerEmail,
         subtotal = dto.subtotal,
-        tax = TaxUtil.calculateTax(dto.shippingState, dto.subtotal),
+        tax = BigDecimal.ZERO,
         shippingCost = ShippingUtil.FLAT_SHIPPING_COST,
         shippingFirstName = dto.shippingFirstName,
         shippingLastName = dto.shippingLastName,

@@ -13,7 +13,6 @@ import com.yellrecords.services.order.mapper.OrderMapper
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
 import com.yellrecords.services.paypal.PayPalClient
 import com.yellrecords.services.paypal.PayPalOrderResponse
-import com.yellrecords.services.util.TaxUtil
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.http.HttpStatus
@@ -158,10 +157,7 @@ class OrderService(
         order.shippingAddressLine2 = updates.shippingAddressLine2
 
         updates.shippingCity?.let { order.shippingCity = it }
-        updates.shippingState?.let {
-            order.shippingState = it
-            order.tax = TaxUtil.calculateTax(it, order.subtotal)
-        }
+        updates.shippingState?.let { order.shippingState = it }
         updates.shippingPostalCode?.let { order.shippingPostalCode = it }
         updates.shippingPhone?.let { order.shippingPhone = it }
 
@@ -249,7 +245,6 @@ class OrderService(
         ensureAnonymizationAllowed(order)
 
         // Anonymized fields
-        // NOTE: State intentionally left out for tax purposes.
         order.buyerEmail = "deleted+${order.orderNumber}@example.com"
         order.shippingFirstName = "Deleted"
         order.shippingLastName = "User"
