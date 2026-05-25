@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Notification</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #333;">
+
+<h2>You have received an order.</h2>
+
+<p><strong>Order ID:</strong> <span th:text="${orderItemId}"></span></p>
+<p><strong>Date Added:</strong> <span th:text="${dateAdded}"></span></p>
+<p><strong>Order Status:</strong> <span th:text="${orderStatus}"></span></p>
+
+<h3>Products</h3>
+
+<table width="100%" cellpadding="6" cellspacing="0" border="1" style="border-collapse: collapse;">
+    <thead>
+    <tr style="background-color: #f2f2f2;">
+        <th align="left">Qty</th>
+        <th align="left">Product</th>
+        <th align="right">Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="p : ${products}">
+        <td th:text="${p.quantity}"></td>
+        <td th:text="${p.name}"></td>
+        <td th:text="${p.price}" align="right"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Totals</h3>
+<p><strong>Sub-Total:</strong> <span th:text="${subTotal}"></span></p>
+<p><strong>Flat Shipping Rate:</strong> <span th:text="${shippingRate}"></span></p>
+<p><strong>Total:</strong> <span th:text="${total}"></span></p>
+
+</body>
+</html>
