@@ -77,7 +77,8 @@ class EmailService(
         if (request.shippingAddressLine2 != null && request.shippingAddressLine2 != "") {
             context.setVariable("addr2", request.shippingAddressLine2)
         }
-        val cityStateZip = request.shippingCity + ", " + request.shippingState + " " + request.shippingPostalCode
+        val cityStateZip =
+            request.shippingCity + ", " + request.shippingState + " " + request.shippingPostalCode
         context.setVariable("cityStateZip", cityStateZip)
         val products =
             request.orderItems.map { item ->

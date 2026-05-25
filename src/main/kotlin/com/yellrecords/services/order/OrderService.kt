@@ -186,7 +186,6 @@ class OrderService(
 
         emailService.sendBuyerEmail(order, "buyerCanceledOrder")
 
-
         order.status = OrderStatus.CANCELED
 
         return ResponseEntity.ok().build()
@@ -209,7 +208,6 @@ class OrderService(
         order.shippedAt = OffsetDateTime.now()
 
         emailService.sendBuyerEmail(order, "buyerShippedOrder")
-
 
         return ResponseEntity.ok().build()
     }
