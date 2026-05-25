@@ -1,5 +1,7 @@
 package com.yellrecords.services.order
 
+import com.icegreen.greenmail.util.GreenMail
+import com.icegreen.greenmail.util.ServerSetup
 import com.yellrecords.services.BaseH2Test
 import com.yellrecords.services.cart.CartItem
 import com.yellrecords.services.cart.CartItemRepository
@@ -93,6 +95,9 @@ class OrderControllerTest : BaseH2Test() {
             CartItem(guestSessionId = guestId, listingId = listing1.id!!, quantity = 1)
 
         cartItemRepository.save(guestCartItem)
+        val server = GreenMail(ServerSetup.SMTP)
+        server.start()
+
     }
 
     @Nested
