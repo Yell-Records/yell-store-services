@@ -6,8 +6,6 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.hibernate.annotations.JdbcTypeCode
-import org.hibernate.type.SqlTypes
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -21,9 +19,6 @@ class ArtistPage(
     @Column(nullable = false) var slug: String,
     @Column(nullable = false) var name: String,
     @Column(name = "body_html", nullable = false) var bodyHtml: String,
-    @Column(name = "youtube_urls", nullable = false, columnDefinition = "TEXT[]")
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    var youtubeUrls: List<String> = emptyList(),
     @Column(name = "category_id", nullable = false) var categoryId: UUID,
     @Column(name = "created_at", nullable = false)
     var createdAt: OffsetDateTime = OffsetDateTime.now(),

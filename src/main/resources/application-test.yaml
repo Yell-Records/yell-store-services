@@ -34,6 +34,9 @@ images:
   bucket:
   base-url:
 
+policies:
+  path: storage/policies
+
 paypal:
   client-id:
   client-secret:
@@ -43,6 +46,10 @@ jobs:
   stale-order-cleanup:
     cutoff-days: 7
     enabled: false
+    cron: "0 0 0 * * *"
+  cart-item-cleanup:
+    enabled: false
+    cutoff-days: 7
     cron: "0 0 0 * * *"
 
 jwt:

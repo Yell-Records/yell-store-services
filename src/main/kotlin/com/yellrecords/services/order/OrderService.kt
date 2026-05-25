@@ -14,9 +14,9 @@ import com.yellrecords.services.order.mapper.OrderMapper
 import com.yellrecords.services.orderitem.mapper.OrderItemMapper
 import com.yellrecords.services.paypal.PayPalClient
 import com.yellrecords.services.paypal.PayPalOrderResponse
-import com.yellrecords.services.util.TaxUtil
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -52,6 +52,14 @@ class OrderService(
         return OrderMapper.toDto(order)
     }
 
+    fun getOrderByOrderNumber(orderNumber: Long): OrderDto {
+        val order =
+            orderRepository.findOrderByOrderNumber(orderNumber)
+                ?: throw NotFoundException("Order number not found: $orderNumber")
+
+        return OrderMapper.toDto(order)
+    }
+
     /**
      * Saves a new order and its items to the database using the buyer's associated cart items.
      *
@@ -59,6 +67,10 @@ class OrderService(
      */
     @Transactional
     fun createOrder(orderInfo: CreateOrderRequestDto): OrderDto {
+        if (!orderInfo.acceptedTerms) {
+            throw BadRequestException("Request must accept terms of service and privacy policy.")
+        }
+
         if (orderInfo.subtotal <= BigDecimal.ZERO) {
             throw BadRequestException("Subtotal must be greater than 0.")
         }
@@ -66,7 +78,9 @@ class OrderService(
         val cartItems = cartItemService.getCartItemsByGuestId(orderInfo.guestSessionId)
         cartItems.ifEmpty { throw BadRequestException("Order has no items!") }
 
-        val orderEntity = OrderMapper.asNewEntity(orderInfo)
+        val policyAcceptedTz = OffsetDateTime.now()
+
+        val orderEntity = OrderMapper.asNewEntity(orderInfo, policyAcceptedTz)
 
         // Convert all cart items from the client into order items
         cartItems.forEach { cartItemDto ->
@@ -145,10 +159,7 @@ class OrderService(
         order.shippingAddressLine2 = updates.shippingAddressLine2
 
         updates.shippingCity?.let { order.shippingCity = it }
-        updates.shippingState?.let {
-            order.shippingState = it
-            order.tax = TaxUtil.calculateTax(it, order.subtotal)
-        }
+        updates.shippingState?.let { order.shippingState = it }
         updates.shippingPostalCode?.let { order.shippingPostalCode = it }
         updates.shippingPhone?.let { order.shippingPhone = it }
 
@@ -223,6 +234,43 @@ class OrderService(
         order.status = OrderStatus.FULFILLED
 
         return ResponseEntity.ok().build()
+    }
+
+    @Transactional
+    fun anonymizeOrder(orderId: UUID): ResponseEntity<OrderDto> {
+        val order = findOrder(orderId)
+
+        if (order.anonymized) {
+            return ResponseEntity.noContent().build()
+        }
+
+        ensureAnonymizationAllowed(order)
+
+        // Anonymized fields
+        order.buyerEmail = "deleted+${order.orderNumber}@example.com"
+        order.shippingFirstName = "Deleted"
+        order.shippingLastName = "User"
+        order.shippingAddressLine1 = "Anonymized"
+        order.shippingAddressLine2 = null
+        order.shippingCity = "Anonymized"
+        order.shippingPostalCode = "00000"
+        order.shippingPhone = "0000000000"
+
+        order.anonymized = true
+        order.anonymizedAt = OffsetDateTime.now()
+
+        val dto = OrderMapper.toDto(order)
+
+        return ResponseEntity(dto, HttpStatus.OK)
+    }
+
+    private fun ensureAnonymizationAllowed(order: Order) {
+        val shippedStatuses =
+            setOf(OrderStatus.IN_PROGRESS, OrderStatus.AWAITING_PAYMENT, OrderStatus.PAID)
+
+        if (order.status in shippedStatuses) {
+            throw ConflictException("Order status must be in a post-shipped state.")
+        }
     }
 
     private fun ensureCorrectOrderState(order: Order) {

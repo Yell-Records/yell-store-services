@@ -40,4 +40,4 @@ out/
 .kotlin
 
 ### Image uploads ###
-/uploads/
+/storage/uploads/

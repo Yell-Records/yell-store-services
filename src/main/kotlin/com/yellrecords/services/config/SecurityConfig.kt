@@ -1,7 +1,7 @@
 package com.yellrecords.services.config
 
 import com.yellrecords.services.auth.CustomUserDetailsService
-import com.yellrecords.services.auth.JwtAuthenticationFilter
+import com.yellrecords.services.auth.filters.JwtAuthenticationFilter
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

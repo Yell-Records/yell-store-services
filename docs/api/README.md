@@ -26,8 +26,8 @@ Endpoints for item listing categories.
 
 ### Item Listings
 Endpoints for products being sold.
-- [Get all item listings](item-listings/item-listings-get.md): `GET /api/item-listings`
-- [Get item listing by ID](item-listings/item-listings-get-id.md): `GET /api/item-listings/:id`
+- [Get all active item listings](item-listings/item-listings-get.md): `GET /api/item-listings`
+- [Get item listing by ID](item-listings/item-listings-get-id.md): `GET /api/item-listings/listing/:id`
 - [Get item listings under category](item-listings/item-listings-get-category.md): `GET /api/item-listings/category/:slug`
 
 ### Orders
@@ -58,16 +58,19 @@ to administrator accounts.
 - [Upload image](images/image-post-upload.md): `POST /api/images/upload`
 
 ### Item Listings
+- [Get all item listings](item-listings/item-listings-get-all.md): `GET /api/item-listings/all`
 - [Create new item listing](item-listings/item-listings-post.md): `POST /api/item-listings`
 - [Update item listing](item-listings/item-listings-patch-id.md): `PATCH /api/item-listings/:id`
 
 ### Orders
 - [Get orders organized by status](orders/orders-get.md): `GET /api/orders`
 - [Get order by ID](orders/orders-get-id.md): `GET /api/orders/:id`
+- [Get order by order number](orders/orders-get-order-number.md): `GET /api/orders/order-number/:orderNumber`
 - [Set order status to in-progress](orders/orders-patch-confirm.md): `PATCH /api/orders/:id/confirm`
 - [Set order status to shipped](orders/orders-patch-shipped.md): `PATCH /api/orders/:id/shipped`
 - [Set order status to fulfilled](orders/orders-patch-fulfill.md): `PATCH /api/orders/:id/fulfill`
 - [Set order status to canceled](orders/orders-patch-cancel.md): `PATCH /api/orders/:id/cancel`
+- [Anonymize customer data in order](orders/orders-patch-anonymize.md): `PATCH /api/orders/:id/anonymize`
 
 ### Users
 Endpoints mostly for administrators to manage website access.

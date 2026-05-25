@@ -55,6 +55,7 @@ Creates a new purchase order.
   "buyerEmail": "user@test.com",
   "status": "IN_PROGRESS",
   "subtotal": 30.23,
+  "orderNumber": 10482812,
   "tax": 1.0,
   "shippingCost": 5.0,
   "totalPaid": 36.23,
@@ -79,9 +80,11 @@ Creates a new purchase order.
     }
   ],
   "trackingNumber": null,
-  "trackingCarrier": null,
   "paidAt": "2026-05-05T22:00:00Z",
-  "shippedAt": null
+  "shippedAt": null,
+  "policiesAcceptedAt": "2026-05-05T22:00:00Z",
+  "anonymized": false,
+  "anonymizedAt": null
 }
 ```
 

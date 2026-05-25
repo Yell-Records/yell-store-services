@@ -1,9 +1,9 @@
-# Get Order by ID
-Retrieves an order entity by its ID.
+# Get Order from Order Number
+Retrieves an order associated with an order number.
 
-**URL**: `/api/orders/:id`
+**URL**: `/api/orders/order-number/:orderNumber`
 
-**URL parameters**: `id=[UUID]` where `id` is the order ID.
+**URL parameters**: `orderNumber=[number]` where `orderNumber` is the order number.
 
 **Method**: `GET`
 
@@ -12,11 +12,12 @@ Retrieves an order entity by its ID.
 **Permissions required**: ADMIN
 
 ## Success Response
-**Condition**: The order exists.
+**Condition**: Order exists.
 
 **Code**: `200 OK`
 
 ### Content example
+Get order with order number **10482812**:
 ```json
 {
   "id": "b81f19e1-e291-40a0-b17e-ba7740d93efe",
