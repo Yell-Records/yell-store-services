@@ -36,6 +36,12 @@ class OrderController(
         @PathVariable id: UUID,
     ): OrderDto = orderService.getOrder(id)
 
+    @GetMapping("/order-number/{orderNumber}")
+    @RolesAllowed(UserRole.ADMIN)
+    fun getOrderFromNumber(
+        @PathVariable orderNumber: Long,
+    ): OrderDto = orderService.getOrderByOrderNumber(orderNumber)
+
     @PostMapping("/{id}/paypal/create")
     fun createPaypalOrder(
         @PathVariable id: UUID,
@@ -85,4 +91,10 @@ class OrderController(
     fun cancelOrder(
         @PathVariable id: UUID,
     ): ResponseEntity<Void> = orderService.cancelOrder(id)
+
+    @PatchMapping("/{id}/anonymize")
+    @RolesAllowed(UserRole.ADMIN)
+    fun anonymizeOrder(
+        @PathVariable id: UUID,
+    ): ResponseEntity<OrderDto> = orderService.anonymizeOrder(id)
 }

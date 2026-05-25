@@ -30,6 +30,9 @@ Default profile.
   - Default: 5ffSrvavg96EzEcIf04juxRFgA1vudQ7WUOjbO2LgGk
   - Secret to use when generating Java Web Tokens for admins logging in
   - Encryption strength must be 256 bits
+- `POLICIES_PATH`
+  - Default: _storage/policies_
+  - Filepath to where policy files are stored
 
 ## Production (prod)
 Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
@@ -46,6 +49,7 @@ Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 - `JWT_SECRET` - 256-bit encryption secret for generating Java Web Tokens
 - `PAYPAL_CLIENT_ID` - Client ID for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
 - `PAYPAL_CLIENT_SECRET` - Client secret for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
+- `POLICIES_PATH` - Filepath to where policies are stored
 
 ### Optional
 
@@ -60,6 +64,20 @@ orders.
   - Default 3
   - The amount of days orders must be older than to be considered stale.
 - `JOB_STALE_ORDERS_CRON`
+  - Default `0 0 2 * * *` (every day at 2am)
+  - [Cron expression](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/scheduling/support/CronExpression.html)
+    for when this job should run.
+
+#### Cart item cleanup job
+This scheduled job purges cart items associated with a guest session ID if the **maximum** timestamp date on one of
+the cart items goes beyond the cutoff date. It ensures all cart item entities are not stale.
+- `JOB_CART_CLEANUP_ENABLED`
+  - Default `true`
+  - If this job should run.
+- `JOB_CART_CLEANUP_CUTOFF_DAYS`
+  - Default 3
+  - The amount of days cart item timestamps must be younger than to be considered stale.
+- `JOB_CART_CLEANUP_CRON`
   - Default `0 0 2 * * *` (every day at 2am)
   - [Cron expression](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/scheduling/support/CronExpression.html)
     for when this job should run.

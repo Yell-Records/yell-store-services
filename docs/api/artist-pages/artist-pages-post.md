@@ -15,7 +15,6 @@ Creates a new artist page.
   "slug": "[string]",
   "name": "[string]",
   "bodyHtml": "[string]",
-  "youtubeUrls": "[text array]",
   "categorySlug": "[string slug of existing category]"
 }
 ```
@@ -26,7 +25,6 @@ Creates a new artist page.
   "slug": "hank-locklin",
   "name": "Hank Locklin",
   "bodyHtml": "<h1>Hank Locklin</h1><p>Country music singer.</p>",
-  "youtubeUrls": ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
   "categorySlug": "hank-locklin"
 }
 ```
@@ -43,7 +41,6 @@ Creates a new artist page.
   "slug": "hank-locklin",
   "name": "Hank Locklin",
   "bodyHtml": "<h1>Hank Locklin</h1><p>Country music singer.</p>",
-  "youtubeUrls": ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
   "categoryId": "0e91cef8-2fa7-4b1a-94c1-c02b969289a4",
   "createdAt": "2026-05-05T22:00:00Z",
   "updatedAt": "2026-05-05T22:00:00Z"

@@ -33,9 +33,12 @@ spring:
 
 images:
   provider: ${IMAGE_PROVIDER:LOCAL}
-  upload-dir: ${IMAGE_UPLOAD_DIR:uploads}
+  upload-dir: ${IMAGE_UPLOAD_DIR:storage/uploads}
   bucket: ${IMAGE_BUCKET:}
   base-url: "${IMAGE_BASE_URL:http://localhost:8080}"
+
+policies:
+  path: ${POLICIES_PATH:storage/policies}
 
 paypal:
   client-id: ${PAYPAL_CLIENT_ID}
@@ -47,6 +50,10 @@ jobs:
     enabled: true
     cutoff-days: 1
     cron: "0 */5 * * * *"
+  cart-item-cleanup:
+    enabled: true
+    cutoff-days: 1
+    cron: "0 */10 * * * *"
 
 jwt:
   secret: ${JWT_SECRET:5ffSrvavg96EzEcIf04juxRFgA1vudQ7WUOjbO2LgGk}

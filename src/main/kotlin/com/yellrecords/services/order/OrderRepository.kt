@@ -35,4 +35,6 @@ interface OrderRepository : JpaRepository<Order, UUID> {
         """,
     )
     fun findAllToClean(cutoff: OffsetDateTime): List<Order>
+
+    fun findOrderByOrderNumber(orderNumber: Long): Order?
 }

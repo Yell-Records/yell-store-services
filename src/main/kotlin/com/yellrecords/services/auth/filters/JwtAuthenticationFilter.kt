@@ -1,5 +1,7 @@
-package com.yellrecords.services.auth
+package com.yellrecords.services.auth.filters
 
+import com.yellrecords.services.auth.CustomUserDetailsService
+import com.yellrecords.services.auth.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

@@ -1,13 +1,13 @@
-# Get all Active Item Listings
-Retrieves every item listing currently marked as active.
+# Get all Item Listings
+Retrieves every item listing.
 
-**URL**: `/api/item-listings`
+**URL**: `/api/item-listings/all`
 
 **Method**: `GET`
 
-**Auth required**: NO
+**Auth required**: YES
 
-**Permissions required**: None
+**Permissions required**: Admin
 
 ## Success Response
 **Condition**: Always.
