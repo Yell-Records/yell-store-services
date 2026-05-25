@@ -28,11 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
 import java.util.UUID
 
+@ActiveProfiles("test")
 class OrderControllerTest : BaseH2Test() {
     companion object {
         private const val BASE_PATH = "/api/orders"

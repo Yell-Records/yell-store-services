@@ -17,13 +17,12 @@ spring:
       emailCheck: "1=1"
 
   mail:
-    host: localhost
-    port: 1025
-    username:
-    password:
+    host: 0.0.0.0
+    port: 0
     properties:
-      mail:
-        host: invalid
+      mail.smtp.connectiontimeout: 1
+      mail.smtp.timeout: 1
+      mail.smtp.writetimeout:
 
 images:
   provider: LOCAL
