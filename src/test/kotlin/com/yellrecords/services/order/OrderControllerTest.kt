@@ -1,13 +1,12 @@
 package com.yellrecords.services.order
 
-import com.icegreen.greenmail.util.GreenMail
-import com.icegreen.greenmail.util.ServerSetup
 import com.yellrecords.services.BaseH2Test
 import com.yellrecords.services.cart.CartItem
 import com.yellrecords.services.cart.CartItemRepository
 import com.yellrecords.services.cart.CartItemService
 import com.yellrecords.services.itemlisting.ItemListing
 import com.yellrecords.services.mail.EmailService
+import com.yellrecords.services.mail.NoEmailTest
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.order.dto.TrackingDetailsDto
@@ -27,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
@@ -36,6 +36,7 @@ import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
 import java.util.UUID
 
+@Import(NoEmailTest::class)
 @ActiveProfiles("test")
 class OrderControllerTest : BaseH2Test() {
     companion object {
@@ -95,9 +96,6 @@ class OrderControllerTest : BaseH2Test() {
             CartItem(guestSessionId = guestId, listingId = listing1.id!!, quantity = 1)
 
         cartItemRepository.save(guestCartItem)
-        val server = GreenMail(ServerSetup.SMTP)
-        server.start()
-
     }
 
     @Nested
