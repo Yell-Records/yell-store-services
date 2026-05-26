@@ -3,6 +3,6 @@
     "username": "Admin",
     "password": "admin",
     "email": "admin@test.com",
-    "role": "admin"
+    "role": "ADMIN"
   }
 ]

@@ -9,10 +9,12 @@ interface UserRepository : JpaRepository<User, UUID> {
 
     @Query(
         """
-            select u from User u order by createdAt desc limit 1
+            SELECT u FROM User u
+            WHERE u.role = "ADMIN"
+            ORDER BY u.createdAt DESC LIMIT 1
         """,
     )
-    fun findAdmin(): User?
+    fun findFirstAdmin(): User?
 
     fun existsByUsernameIgnoreCase(username: String): Boolean
 }

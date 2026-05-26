@@ -10,7 +10,7 @@ import java.io.InputStream
 import java.util.Properties
 
 @TestConfiguration
-class NoEmailTest {
+class MockEmailConfig {
     @Bean
     fun mailSender(): JavaMailSender =
         object : JavaMailSender {

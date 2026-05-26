@@ -25,8 +25,7 @@ spring:
     username:
     password:
     properties:
-      mail:
-        smtp:
+      mail.smtp:
           auth: false
           starttls:
             enable: false

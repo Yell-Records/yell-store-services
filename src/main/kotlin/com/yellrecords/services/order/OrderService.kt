@@ -6,6 +6,7 @@ import com.yellrecords.services.exception.ConflictException
 import com.yellrecords.services.exception.ForbiddenException
 import com.yellrecords.services.exception.NotFoundException
 import com.yellrecords.services.mail.EmailService
+import com.yellrecords.services.mail.EmailSubject
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.order.dto.TrackingDetailsDto
@@ -112,8 +113,9 @@ class OrderService(
         order.status = OrderStatus.PAID
         order.paidAt = OffsetDateTime.now()
 
-        emailService.sendSellerEmail(order)
-        emailService.sendBuyerEmail(order, "buyerInitialOrder")
+        emailService.sendSellerReceivedEmail(order)
+        emailService.sendBuyerEmail(order, EmailSubject.BUYER_RECEIVED)
+
         // Clear the client's cart items
         cartItemService.deleteGuestCartItems(order.guestSessionId)
 
@@ -179,7 +181,7 @@ class OrderService(
 
         order.status = OrderStatus.IN_PROGRESS
 
-        emailService.sendBuyerEmail(order, "buyerConfirmOrder")
+        emailService.sendBuyerEmail(order, EmailSubject.BUYER_CONFIRMED)
 
         return ResponseEntity.ok().build()
     }
@@ -195,7 +197,7 @@ class OrderService(
             throw ConflictException("Order must not be in shipped state (was ${order.status}).")
         }
 
-        emailService.sendBuyerEmail(order, "buyerCanceledOrder")
+        emailService.sendBuyerEmail(order, EmailSubject.BUYER_CANCELED)
 
         order.status = OrderStatus.CANCELED
 
@@ -218,7 +220,7 @@ class OrderService(
         order.trackingNumber = trackingDetails.trackingNumber
         order.shippedAt = OffsetDateTime.now()
 
-        emailService.sendBuyerEmail(order, "buyerShippedOrder")
+        emailService.sendBuyerEmail(order, EmailSubject.BUYER_SHIPPED)
 
         return ResponseEntity.ok().build()
     }

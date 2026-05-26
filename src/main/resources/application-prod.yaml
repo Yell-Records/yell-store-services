@@ -20,13 +20,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   mail:
-    host: localhost
-    port: 1025
-    username:
-    password:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
-      mail:
-        smtp:
+      mail.smtp:
           auth: false
           starttls:
             enable: false

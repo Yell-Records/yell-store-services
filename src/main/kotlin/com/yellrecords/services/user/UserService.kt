@@ -55,10 +55,4 @@ class UserService(
 
         return UserMapper.toDto(user)
     }
-
-    fun findAdmin(): UserDto {
-        val user = repo.findAdmin() ?: throw NotFoundException("User not found.")
-
-        return UserMapper.toDto(user)
-    }
 }

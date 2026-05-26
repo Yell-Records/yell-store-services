@@ -20,9 +20,10 @@ spring:
     host: 0.0.0.0
     port: 0
     properties:
-      mail.smtp.connectiontimeout: 1
-      mail.smtp.timeout: 1
-      mail.smtp.writetimeout:
+      mail.smtp:
+        connectiontimeout: 1
+        timeout: 1
+        writetimeout:
 
 images:
   provider: LOCAL

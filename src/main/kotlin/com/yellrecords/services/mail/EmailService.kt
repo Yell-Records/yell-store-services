@@ -1,7 +1,7 @@
 package com.yellrecords.services.mail
 
 import com.yellrecords.services.order.Order
-import com.yellrecords.services.user.UserService
+import com.yellrecords.services.user.UserRepository
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
@@ -12,9 +12,45 @@ import org.thymeleaf.context.Context
 class EmailService(
     private val mailSender: JavaMailSender,
     private val templateEngine: TemplateEngine,
-    private val userService: UserService,
+    private val userRepository: UserRepository,
 ) {
-    fun sendEmail(
+    /**
+     * Sends an "Order received" email to the site merchant.
+     *
+     * @param order Order details to use in email HTML template construction.
+     */
+    fun sendSellerReceivedEmail(order: Order) {
+        val context = baseEmailContext(order)
+
+        val adminEmail =
+            userRepository.findFirstAdmin()?.email ?: error("Cannot locate administrator email.")
+        val subjectLine = EmailSubject.SELLER_RECEIVED.with(order.orderNumber!!)
+        val htmlBody = templateEngine.process(EmailSubject.SELLER_RECEIVED.templateName, context)
+
+        sendEmail(to = adminEmail, subjectLine, htmlBody)
+    }
+
+    /**
+     * Sends an email to the buyer of an order.
+     *
+     * @param order Order details to use in HTML template construction. The
+     *   [buyerEmail][Order.buyerEmail] property is the recipient of the email.
+     * @param emailSubject The type of email to send.
+     * @see EmailSubject
+     */
+    fun sendBuyerEmail(
+        order: Order,
+        emailSubject: EmailSubject,
+    ) {
+        val context = buyerEmailContext(order)
+
+        val subjectLine = emailSubject.with(order.orderNumber!!)
+        val htmlBody = templateEngine.process(emailSubject.templateName, context)
+
+        sendEmail(to = order.buyerEmail, subjectLine, htmlBody)
+    }
+
+    private fun sendEmail(
         to: String,
         subject: String,
         body: String,
@@ -29,87 +65,68 @@ class EmailService(
         mailSender.send(message)
     }
 
-    fun sendSellerEmail(request: Order) {
-        val context = Context()
-        context.setVariable("orderItemId", request.orderNumber)
-        context.setVariable("dateAdded", request.createdAt.toLocalDate())
-        context.setVariable("orderStatus", request.status)
-        context.setVariable("subTotal", request.subtotal)
-        context.setVariable("shippingRate", request.shippingCost)
-        context.setVariable("total", request.totalPaid)
+    companion object {
+        /**
+         * Constructs a base email context.
+         *
+         * @param order Order to use for template construction.
+         * @return Email context with variables set
+         */
+        private fun baseEmailContext(order: Order): Context {
+            val context = Context()
 
-        val products =
-            request.orderItems.map { item ->
-                mapOf(
-                    "name" to item.listingTitle,
-                    "quantity" to item.quantity,
-                    "price" to item.listingPrice,
-                    "total" to (item.listingPrice * item.quantity.toBigDecimal()),
-                )
-            }
-        context.setVariable("products", products)
-        val templateName = "sellerOrder"
-        val subject = "Order " + request.orderNumber + " Received"
-        val htmlBody = templateEngine.process(templateName, context)
-        val to = userService.findAdmin().email ?: ""
-        sendEmail(to, subject, htmlBody)
-    }
+            context.setVariable("orderItemId", order.orderNumber!!)
+            context.setVariable("dateAdded", order.createdAt.toLocalDate())
+            context.setVariable("orderStatus", order.status)
+            context.setVariable("subTotal", order.subtotal)
+            context.setVariable("shippingCost", order.shippingCost)
+            context.setVariable("total", order.totalPaid)
 
-    fun sendBuyerEmail(
-        request: Order,
-        templateName: String,
-    ) {
-        val to = request.buyerEmail
-        val context = Context()
-        context.setVariable("orderItemId", request.orderNumber)
-        context.setVariable("dateAdded", request.createdAt.toLocalDate())
-        context.setVariable("orderStatus", request.status)
-        context.setVariable("subTotal", request.subtotal)
-        context.setVariable("email", to)
-        context.setVariable("phone", request.shippingPhone)
-        context.setVariable("status", request.status)
-        context.setVariable("shippingCost", request.shippingCost)
-        context.setVariable("total", request.totalPaid)
-        context.setVariable("trackingNo", request.trackingNumber)
-        val name = request.shippingFirstName + " " + request.shippingLastName
-        context.setVariable("name", name)
-        context.setVariable("addr1", request.shippingAddressLine1)
-        if (request.shippingAddressLine2 != null && request.shippingAddressLine2 != "") {
-            context.setVariable("addr2", request.shippingAddressLine2)
+            val products =
+                order.orderItems.map { item ->
+                    val itemTotal = item.listingPrice * item.quantity.toBigDecimal()
+
+                    EmailProduct(
+                        name = item.listingTitle,
+                        quantity = item.quantity,
+                        price = item.listingPrice,
+                        total = itemTotal,
+                    )
+                }
+
+            context.setVariable("products", products)
+
+            return context
         }
-        val cityStateZip =
-            request.shippingCity + ", " + request.shippingState + " " + request.shippingPostalCode
-        context.setVariable("cityStateZip", cityStateZip)
-        val products =
-            request.orderItems.map { item ->
-                mapOf(
-                    "name" to item.listingTitle,
-                    "quantity" to item.quantity,
-                    "price" to item.listingPrice,
-                    "total" to (item.listingPrice * item.quantity.toBigDecimal()),
-                )
-            }
-        context.setVariable("products", products)
-        var subject = ""
-        when (templateName) {
-            "buyerInitialOrder" -> {
-                subject = "Order " + request.orderNumber + " Received"
+
+        /**
+         * Extends the base email context construction with other necessary variables for buyers to
+         * see.
+         *
+         * @param order Order to use for template construction.
+         * @return Extended email context with variables set.
+         * @see baseEmailContext
+         */
+        private fun buyerEmailContext(order: Order): Context {
+            val context = baseEmailContext(order)
+
+            context.setVariable("email", order.buyerEmail)
+            context.setVariable("phone", order.shippingPhone)
+            context.setVariable("trackingNo", order.trackingNumber)
+
+            val name = "${order.shippingFirstName} ${order.shippingLastName}"
+            context.setVariable("name", name)
+            context.setVariable("addr1", order.shippingAddressLine1)
+
+            if (order.shippingAddressLine2 != null && order.shippingAddressLine2 != "") {
+                context.setVariable("addr2", order.shippingAddressLine2)
             }
 
-            "buyerConfirmOrder" -> {
-                subject = "Order " + request.orderNumber + " Confirmed"
-            }
+            val cityStateZip =
+                "${order.shippingCity}, ${order.shippingState} ${order.shippingPostalCode}"
+            context.setVariable("cityStateZip", cityStateZip)
 
-            "buyerShippedOrder" -> {
-                subject = "Order " + request.orderNumber + " Shipped"
-            }
-
-            "buyerCanceledOrder" -> {
-                subject = "Order " + request.orderNumber + " Canceled"
-            }
+            return context
         }
-        val htmlBody = templateEngine.process(templateName, context)
-
-        sendEmail(to, subject, htmlBody)
     }
 }

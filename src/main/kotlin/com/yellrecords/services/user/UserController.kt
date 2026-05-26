@@ -32,12 +32,6 @@ class UserController(
         @AuthenticationPrincipal user: CustomUserDetails,
     ): UserDto = service.getUserById(user.id)
 
-    @GetMapping("/admin")
-    @RolesAllowed(UserRole.ADMIN)
-    fun getAdmin(
-        @PathVariable id: UUID,
-    ): UserDto = service.findAdmin()
-
     @PatchMapping("/{id}/email")
     @PreAuthorize("isAuthenticated() && #id == authentication.principal.id")
     fun updateUserEmail(

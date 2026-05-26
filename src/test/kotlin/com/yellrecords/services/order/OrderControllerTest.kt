@@ -6,7 +6,7 @@ import com.yellrecords.services.cart.CartItemRepository
 import com.yellrecords.services.cart.CartItemService
 import com.yellrecords.services.itemlisting.ItemListing
 import com.yellrecords.services.mail.EmailService
-import com.yellrecords.services.mail.NoEmailTest
+import com.yellrecords.services.mail.MockEmailConfig
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.order.dto.TrackingDetailsDto
@@ -30,14 +30,12 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
 import java.util.UUID
 
-@Import(NoEmailTest::class)
-@ActiveProfiles("test")
+@Import(MockEmailConfig::class)
 class OrderControllerTest : BaseH2Test() {
     companion object {
         private const val BASE_PATH = "/api/orders"
