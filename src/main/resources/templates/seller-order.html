@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .order-table th {
+            text-align: left;
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .price-row {
+            text-align: right;
+        }
+
+        .order-table thead tr {
+            background: #f9fafb;
+        }
+    </style>
+
+    <title>Order Notification</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #333;">
+
+<h2>You have received an order.</h2>
+
+<p><strong>Order Number:</strong> <span th:text="${orderNumber}"></span></p>
+<p><strong>Date Added:</strong> <span th:text="${dateAdded}"></span></p>
+
+<h3>Products</h3>
+
+<table class="order-table">
+    <thead>
+    <tr style="background-color: #f2f2f2;">
+        <th>Qty</th>
+        <th>Product</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="p : ${products}">
+        <td th:text="${p.quantity}"></td>
+        <td>
+            <a th:href="${websiteUrl} + '/listing/' + ${p.listingId}"
+               th:text="${p.name}"></a>
+        </td>
+        <td class="price-row" th:text="'$' + ${p.price}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Totals</h3>
+<p><strong>Sub-Total:</strong> <span th:text="'$' + ${subTotal}"></span></p>
+<p><strong>Flat Shipping Rate:</strong> <span th:text="'$' + ${shippingCost}"></span></p>
+<p><strong>Total:</strong> <span th:text="'$' + ${total}"></span></p>
+
+</body>
+</html>

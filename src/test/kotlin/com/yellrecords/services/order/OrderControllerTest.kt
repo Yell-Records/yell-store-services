@@ -5,6 +5,8 @@ import com.yellrecords.services.cart.CartItem
 import com.yellrecords.services.cart.CartItemRepository
 import com.yellrecords.services.cart.CartItemService
 import com.yellrecords.services.itemlisting.ItemListing
+import com.yellrecords.services.mail.EmailService
+import com.yellrecords.services.mail.MockEmailConfig
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.order.dto.TrackingDetailsDto
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpMethod.GET
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
@@ -32,6 +35,7 @@ import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
 import java.util.UUID
 
+@Import(MockEmailConfig::class)
 class OrderControllerTest : BaseH2Test() {
     companion object {
         private const val BASE_PATH = "/api/orders"
@@ -48,6 +52,8 @@ class OrderControllerTest : BaseH2Test() {
     @Autowired lateinit var orderItemRepository: OrderItemRepository
 
     @Autowired lateinit var orderService: OrderService
+
+    @Autowired lateinit var emailService: EmailService
 
     private lateinit var listing1: ItemListing
     private lateinit var listing2: ItemListing
@@ -149,6 +155,7 @@ class OrderControllerTest : BaseH2Test() {
                     orderRepository = orderRepository,
                     cartItemService = cartItemService,
                     paypalClient = mockPayPalClient,
+                    emailService = emailService,
                 )
 
             mockOrderService.captureOrder(saved.id!!)

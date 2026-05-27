@@ -47,6 +47,10 @@ Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 - `IMAGE_PROVIDER` - Should be set to S3, but can be set to LOCAL if needed (not recommended)
 - `IMAGE_UPLOAD_DIR` - Directory for image uploads
 - `JWT_SECRET` - 256-bit encryption secret for generating Java Web Tokens
+- `MAIL_HOST` - URI of email server
+- `MAIL_PORT` - SMTP port of email server
+- `MAIL_USERNAME` - Mail server username
+- `MAIL_PASSWORD` - Mail server password for user
 - `PAYPAL_CLIENT_ID` - Client ID for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
 - `PAYPAL_CLIENT_SECRET` - Client secret for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
 - `POLICIES_PATH` - Filepath to where policies are stored

@@ -13,6 +13,17 @@ spring:
   jpa:
     show-sql: false
 
+  mail:
+    host:
+    port:
+    username:
+    password:
+    properties:
+      mail.smtp:
+        auth: false
+        starttls:
+          enable: false
+
 logging:
   level:
     root: INFO
@@ -22,3 +33,4 @@ logging:
           connections:
             # Disables showing database information on startup
             pooling: WARN
+

@@ -19,6 +19,17 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      mail.smtp:
+          auth: false
+          starttls:
+            enable: false
+
 images:
   provider: ${IMAGE_PROVIDER:LOCAL}
   upload-dir: ${IMAGE_UPLOAD_DIR:storage/uploads}

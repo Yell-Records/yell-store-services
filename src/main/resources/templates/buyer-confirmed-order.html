@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <style>
+        /* --- Layout & Spacing --- */
+        .mb-20 { margin-bottom: 20px; }
+        .mt-0 { margin-top: 0; }
+
+        /* --- Image --- */
+        .logo {
+            margin-bottom: 20px;
+            border: none;
+            display: block;
+        }
+    </style>
+    <title></title>
+</head>
+
+<body style="font-family: Arial, sans-serif; font-size: 14px; color: #222;">
+
+<!-- Logo -->
+<a th:href="${websiteUrl}" title="Yell Records" target="_blank">
+    <img th:src="${logoUrl}" alt="Yell Records" class="logo">
+</a>
+
+<p class="mt-0 mb-20">
+    Your order has been confirmed and is now being prepared.
+</p>
+
+<p>
+    <b>Order Number:</b> <span th:text="${orderNumber}"></span>
+</p>
+
+<p class="mt-0 mb-20">
+    Please reply to this email if you have any questions.
+</p>
+
+<!-- Footer -->
+<p style="font-size:12px; color:#666; margin-top:40px;">
+    &copy; Yell Records &bull; IL, United States
+</p>
+
+</body>
+</html>

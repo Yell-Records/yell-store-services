@@ -5,6 +5,8 @@ import com.yellrecords.services.exception.BadRequestException
 import com.yellrecords.services.exception.ConflictException
 import com.yellrecords.services.exception.ForbiddenException
 import com.yellrecords.services.exception.NotFoundException
+import com.yellrecords.services.mail.EmailService
+import com.yellrecords.services.mail.EmailSubject
 import com.yellrecords.services.order.dto.CreateOrderRequestDto
 import com.yellrecords.services.order.dto.OrderDto
 import com.yellrecords.services.order.dto.TrackingDetailsDto
@@ -29,6 +31,7 @@ class OrderService(
     private val orderRepository: OrderRepository,
     private val cartItemService: CartItemService,
     private val paypalClient: PayPalClient,
+    private val emailService: EmailService,
 ) {
     @PersistenceContext private lateinit var entityManager: EntityManager
 
@@ -110,7 +113,8 @@ class OrderService(
         order.status = OrderStatus.PAID
         order.paidAt = OffsetDateTime.now()
 
-        // TODO Send email to merchant alerting of a new order
+        emailService.sendSellerInitialEmail(order)
+        emailService.sendBuyerEmail(order, EmailSubject.BUYER_RECEIVED)
 
         // Clear the client's cart items
         cartItemService.deleteGuestCartItems(order.guestSessionId)
@@ -177,7 +181,7 @@ class OrderService(
 
         order.status = OrderStatus.IN_PROGRESS
 
-        // TODO Send confirmation email to buyer
+        emailService.sendBuyerEmail(order, EmailSubject.BUYER_CONFIRMED)
 
         return ResponseEntity.ok().build()
     }
@@ -193,7 +197,7 @@ class OrderService(
             throw ConflictException("Order must not be in shipped state (was ${order.status}).")
         }
 
-        // TODO Send cancellation email to buyer
+        emailService.sendBuyerEmail(order, EmailSubject.BUYER_CANCELED)
 
         order.status = OrderStatus.CANCELED
 
@@ -216,7 +220,7 @@ class OrderService(
         order.trackingNumber = trackingDetails.trackingNumber
         order.shippedAt = OffsetDateTime.now()
 
-        // TODO Send "order shipped" email to buyer
+        emailService.sendBuyerEmail(order, EmailSubject.BUYER_SHIPPED)
 
         return ResponseEntity.ok().build()
     }
