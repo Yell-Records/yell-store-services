@@ -1,5 +1,6 @@
 package com.yellrecords.services.mail
 
+import com.yellrecords.services.config.CorsProps
 import com.yellrecords.services.order.Order
 import com.yellrecords.services.user.UserRepository
 import org.springframework.mail.javamail.JavaMailSender
@@ -13,21 +14,21 @@ class EmailService(
     private val mailSender: JavaMailSender,
     private val templateEngine: TemplateEngine,
     private val userRepository: UserRepository,
+    private val corsProps: CorsProps,
 ) {
     /**
      * Sends an "Order received" email to the site merchant.
      *
      * @param order Order details to use in email HTML template construction.
      */
-    fun sendSellerReceivedEmail(order: Order) {
-        val context = baseEmailContext(order)
+    fun sendSellerInitialEmail(order: Order) {
+        val siteUrl = corsProps.allowedOrigins.first()
+        val context = baseEmailContext(order, siteUrl)
 
-        val adminEmail =
-            userRepository.findFirstAdmin()?.email ?: error("Cannot locate administrator email.")
-        val subjectLine = EmailSubject.SELLER_RECEIVED.with(order.orderNumber!!)
+        val subjectLine = "New Order Received"
         val htmlBody = templateEngine.process(EmailSubject.SELLER_RECEIVED.templateName, context)
 
-        sendEmail(to = adminEmail, subjectLine, htmlBody)
+        sendEmail(to = getAdminEmail(), subjectLine, htmlBody)
     }
 
     /**
@@ -42,9 +43,15 @@ class EmailService(
         order: Order,
         emailSubject: EmailSubject,
     ) {
-        val context = buyerEmailContext(order)
+        val siteUrl = corsProps.allowedOrigins.first()
+        val context = buyerEmailContext(order, siteUrl)
 
-        val subjectLine = emailSubject.with(order.orderNumber!!)
+        val subjectLine =
+            if (emailSubject == EmailSubject.BUYER_CANCELED) {
+                "Your order was canceled"
+            } else {
+                emailSubject.with(order.orderNumber!!)
+            }
         val htmlBody = templateEngine.process(emailSubject.templateName, context)
 
         sendEmail(to = order.buyerEmail, subjectLine, htmlBody)
@@ -61,26 +68,37 @@ class EmailService(
         helper.setTo(to)
         helper.setSubject(subject)
         helper.setText(body, true)
+        helper.setFrom("Yell Records <${getAdminEmail()}>")
 
         mailSender.send(message)
     }
 
+    private fun getAdminEmail() = userRepository.findFirstAdmin()?.email ?: error("Cannot locate administrator email.")
+
     companion object {
+        /** Link to front-end logo. */
+        private const val LOGO_URL = "assets/yell-records-banner.png"
+
         /**
          * Constructs a base email context.
          *
          * @param order Order to use for template construction.
+         * @param websiteLink URL to the website.
          * @return Email context with variables set
          */
-        private fun baseEmailContext(order: Order): Context {
+        private fun baseEmailContext(
+            order: Order,
+            websiteLink: String,
+        ): Context {
             val context = Context()
 
-            context.setVariable("orderItemId", order.orderNumber!!)
+            context.setVariable("orderNumber", order.orderNumber!!)
             context.setVariable("dateAdded", order.createdAt.toLocalDate())
-            context.setVariable("orderStatus", order.status)
             context.setVariable("subTotal", order.subtotal)
             context.setVariable("shippingCost", order.shippingCost)
             context.setVariable("total", order.totalPaid)
+            context.setVariable("websiteUrl", websiteLink)
+            context.setVariable("logoUrl", "$websiteLink/$LOGO_URL")
 
             val products =
                 order.orderItems.map { item ->
@@ -88,6 +106,7 @@ class EmailService(
 
                     EmailProduct(
                         name = item.listingTitle,
+                        listingId = item.listingId,
                         quantity = item.quantity,
                         price = item.listingPrice,
                         total = itemTotal,
@@ -104,11 +123,15 @@ class EmailService(
          * see.
          *
          * @param order Order to use for template construction.
+         * @param websiteLink URL to the website.
          * @return Extended email context with variables set.
          * @see baseEmailContext
          */
-        private fun buyerEmailContext(order: Order): Context {
-            val context = baseEmailContext(order)
+        private fun buyerEmailContext(
+            order: Order,
+            websiteLink: String,
+        ): Context {
+            val context = baseEmailContext(order, websiteLink)
 
             context.setVariable("email", order.buyerEmail)
             context.setVariable("phone", order.shippingPhone)
