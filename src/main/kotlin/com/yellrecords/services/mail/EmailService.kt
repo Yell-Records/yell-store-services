@@ -21,11 +21,11 @@ class EmailService(
      *
      * @param order Order details to use in email HTML template construction.
      */
-    fun sendSellerReceivedEmail(order: Order) {
+    fun sendSellerInitialEmail(order: Order) {
         val siteUrl = corsProps.allowedOrigins.first()
         val context = baseEmailContext(order, siteUrl)
 
-        val subjectLine = EmailSubject.SELLER_RECEIVED.with(order.orderNumber!!)
+        val subjectLine = "New Order Received"
         val htmlBody = templateEngine.process(EmailSubject.SELLER_RECEIVED.templateName, context)
 
         sendEmail(to = getAdminEmail(), subjectLine, htmlBody)
@@ -81,7 +81,10 @@ class EmailService(
          * @param websiteLink URL to the website.
          * @return Email context with variables set
          */
-        private fun baseEmailContext(order: Order, websiteLink: String): Context {
+        private fun baseEmailContext(
+            order: Order,
+            websiteLink: String,
+        ): Context {
             val context = Context()
 
             context.setVariable("orderNumber", order.orderNumber!!)
@@ -119,7 +122,10 @@ class EmailService(
          * @return Extended email context with variables set.
          * @see baseEmailContext
          */
-        private fun buyerEmailContext(order: Order, websiteLink: String): Context {
+        private fun buyerEmailContext(
+            order: Order,
+            websiteLink: String,
+        ): Context {
             val context = baseEmailContext(order, websiteLink)
 
             context.setVariable("email", order.buyerEmail)

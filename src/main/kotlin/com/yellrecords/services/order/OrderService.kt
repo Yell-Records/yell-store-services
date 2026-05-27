@@ -113,7 +113,7 @@ class OrderService(
         order.status = OrderStatus.PAID
         order.paidAt = OffsetDateTime.now()
 
-        emailService.sendSellerReceivedEmail(order)
+        emailService.sendSellerInitialEmail(order)
         emailService.sendBuyerEmail(order, EmailSubject.BUYER_RECEIVED)
 
         // Clear the client's cart items
