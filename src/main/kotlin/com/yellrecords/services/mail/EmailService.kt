@@ -46,7 +46,12 @@ class EmailService(
         val siteUrl = corsProps.allowedOrigins.first()
         val context = buyerEmailContext(order, siteUrl)
 
-        val subjectLine = emailSubject.with(order.orderNumber!!)
+        val subjectLine =
+            if (emailSubject == EmailSubject.BUYER_CANCELED) {
+                "Your order was canceled"
+            } else {
+                emailSubject.with(order.orderNumber!!)
+            }
         val htmlBody = templateEngine.process(emailSubject.templateName, context)
 
         sendEmail(to = order.buyerEmail, subjectLine, htmlBody)
