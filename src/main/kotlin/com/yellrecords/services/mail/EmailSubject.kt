@@ -10,11 +10,11 @@ enum class EmailSubject(
     val templateName: String,
     private val format: String,
 ) {
-    BUYER_RECEIVED(templateName = "buyer-initial-order", format = "Order %s Received"),
-    BUYER_CONFIRMED(templateName = "buyer-confirmed-order", format = "Order %s Confirmed"),
-    BUYER_SHIPPED(templateName = "buyer-shipped-order", format = "Order %s Shipped"),
-    BUYER_CANCELED(templateName = "buyer-canceled-order", format = "Order %s Canceled"),
-    SELLER_RECEIVED(templateName = "seller-order", format = "Order %s Received"),
+    BUYER_RECEIVED(templateName = "buyer-initial-order", format = "Order #%s Received"),
+    BUYER_CONFIRMED(templateName = "buyer-confirmed-order", format = "Order #%s Confirmed"),
+    BUYER_SHIPPED(templateName = "buyer-shipped-order", format = "Order #%s Shipped"),
+    BUYER_CANCELED(templateName = "buyer-canceled-order", format = "Order #%s Canceled"),
+    SELLER_RECEIVED(templateName = "seller-order", format = "Order #%s Received"),
     ;
 
     /**

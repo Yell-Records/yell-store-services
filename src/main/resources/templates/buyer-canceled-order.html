@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="eng">
 <head>
     <style>
         /* --- Layout & Spacing --- */
-        .mb-20 { margin-bottom: 20px; }
-        .mt-0 { margin-top: 0; }
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+        .mt-0 {
+            margin-top: 0;
+        }
 
         /* --- Table Wrappers --- */
         .table {
@@ -17,7 +21,7 @@
 
         /* --- Table Cells --- */
         .cell {
-            font-size: 12px;
+            font-size: 14px;
             border-right: 1px solid #ddd;
             border-bottom: 1px solid #ddd;
             text-align: left;
@@ -25,7 +29,7 @@
         }
 
         .cell-right {
-            font-size: 12px;
+            font-size: 14px;
             border-right: 1px solid #ddd;
             border-bottom: 1px solid #ddd;
             text-align: right;
@@ -33,7 +37,7 @@
         }
 
         .header-cell {
-            font-size: 12px;
+            font-size: 14px;
             border-right: 1px solid #ddd;
             border-bottom: 1px solid #ddd;
             background-color: #efefef;
@@ -49,51 +53,27 @@
             border: none;
             display: block;
         }
-
-        /* --- Links --- */
-        .email-link {
-            color: #0066cc;
-            text-decoration: none;
-        }
     </style>
+    <title></title>
 </head>
 
-<body style="font-family: Arial, sans-serif; font-size: 14px; color: #222;">
-
+<body style="font-family: Arial, sans-serif; font-size: 14px; color: #222">
 <!-- Logo -->
-<a th:href="${storeUrl}" title="Yell Records" target="_blank">
-    <img th:src="${logoUrl}" alt="Yell Records" class="logo">
+<a th:href="${websiteUrl}" title="Yell Records" target="_blank">
+    <img th:src="${logoUrl}" alt="Yell Records" class="logo" />
 </a>
 
 <p class="mt-0 mb-20">
-    Sorry you order has been canceled. You can expect a refund shortly
+    Your order was canceled. We will issue a refund using your original payment method.
 </p>
 
-<!-- ORDER DETAILS -->
-<table class="table">
-    <thead>
-    <tr>
-        <td colspan="2" class="header-cell">Order Details</td>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td class="cell">
-            <b>Order ID:</b> <span th:text="${orderItemId}"></span><br>
-            <b>Date Added:</b> <span th:text="${dateAdded}"></span><br>
-        </td>
+<p>
+    <b>Order Number:</b> <span th:text="${orderNumber}"></span>
+</p>
 
-        <td class="cell">
-            <b>E-mail:</b>
-            <a th:href="'mailto:' + ${email}" th:text="${email}" class="email-link"></a><br>
-            <b>Telephone:</b> <span th:text="${phone}"></span><br>
-            <b>Order Status:</b> <span th:text="${status}"></span>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<h3>Order Details</h3>
 
-<!-- ADDRESSES -->
+<!-- ADDRESS -->
 <table class="table">
     <thead>
     <tr>
@@ -103,10 +83,10 @@
     <tbody>
     <tr>
         <td class="cell">
-            <span th:text="${name}"></span><br>
-            <span th:text="${addr1}"></span><br>
+            <span th:text="${name}"></span><br />
+            <span th:text="${addr1}"></span><br />
             <span th:if="${addr2 != null and !#strings.isEmpty(addr2)}">
-                <span th:text="${addr2}"></span><br>
+              <span th:text="${addr2}"></span><br />
             </span>
             <span th:text="${cityStateZip}"></span>
         </td>
@@ -119,41 +99,49 @@
     <thead>
     <tr>
         <td class="header-cell">Product</td>
-        <td class="header-cell" style="text-align:right;">Quantity</td>
-        <td class="header-cell" style="text-align:right;">Price</td>
-        <td class="header-cell" style="text-align:right;">Total</td>
+        <td class="header-cell" style="text-align: right">Quantity</td>
+        <td class="header-cell" style="text-align: right">Price</td>
+        <td class="header-cell" style="text-align: right">Total</td>
     </tr>
     </thead>
 
     <tbody>
     <tr th:each="p : ${products}">
-        <td class="cell" th:text="${p.name}"></td>
+        <td class="cell">
+            <a th:href="${websiteUrl} + '/listing/' + ${p.listingId}"
+               th:text="${p.name}"></a>
+        </td>
         <td class="cell-right" th:text="${p.quantity}"></td>
-        <td class="cell-right" th:text="${p.price}"></td>
-        <td class="cell-right" th:text="${p.total}"></td>
+        <td class="cell-right" th:text="'$' + ${p.price}"></td>
+        <td class="cell-right" th:text="'$' + ${p.total}"></td>
     </tr>
     </tbody>
 
     <tfoot>
     <tr>
         <td colspan="3" class="cell-right"><b>Sub-Total:</b></td>
-        <td class="cell-right" th:text="${subTotal}"></td>
+        <td class="cell-right" th:text="'$' + ${subTotal}"></td>
     </tr>
 
     <tr>
         <td colspan="3" class="cell-right"><b>Shipping:</b></td>
-        <td class="cell-right" th:text="${shippingCost}"></td>
+        <td class="cell-right" th:text="'$' + ${shippingCost}"></td>
     </tr>
 
     <tr>
         <td colspan="3" class="cell-right"><b>Total:</b></td>
-        <td class="cell-right" th:text="${total}"></td>
+        <td class="cell-right" th:text="'$' + ${total}"></td>
     </tr>
     </tfoot>
 </table>
 
 <p class="mt-0 mb-20">
-    Please reply to this e-mail if you have any questions.
+    Please reply to this email if you have any questions.
+</p>
+
+<!-- Footer -->
+<p style="font-size:12px; color:#666; margin-top:40px;">
+    &copy; Yell Records &bull; IL, United States
 </p>
 
 </body>
