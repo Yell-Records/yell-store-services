@@ -25,9 +25,7 @@ class JwtAuthenticationFilter(
             request.cookies?.firstOrNull { it.name == AuthService.ACCESS_TOKEN_NAME }?.value
 
         accessToken?.let { token ->
-            val tokenUsername = jwtService.extractUsername(token)
-
-            tokenUsername?.let { username ->
+            jwtService.extractUsername(token)?.let { username ->
                 val userDetails = userDetailsService.loadUserByUsername(username)
 
                 val auth =
@@ -35,6 +33,13 @@ class JwtAuthenticationFilter(
 
                 SecurityContextHolder.getContext().authentication = auth
             }
+                ?: run {
+                    response.sendError(
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        "Invalid or expired token.",
+                    )
+                    return
+                }
         }
 
         filterChain.doFilter(request, response)

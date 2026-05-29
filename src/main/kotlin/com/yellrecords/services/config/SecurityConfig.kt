@@ -2,6 +2,7 @@ package com.yellrecords.services.config
 
 import com.yellrecords.services.auth.CustomUserDetailsService
 import com.yellrecords.services.auth.filters.JwtAuthenticationFilter
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -73,7 +74,11 @@ class SecurityConfig {
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter::class.java,
-            )
+            ).exceptionHandling { exceptions ->
+                exceptions.authenticationEntryPoint { _, response, _ ->
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                }
+            }
 
         return http.build()
     }

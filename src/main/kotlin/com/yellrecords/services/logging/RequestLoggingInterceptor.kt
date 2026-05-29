@@ -4,10 +4,9 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
-import org.springframework.security.authentication.AnonymousAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
+import org.springframework.web.servlet.HandlerMapping
 import java.lang.Exception
 import java.util.UUID
 
@@ -25,24 +24,7 @@ class RequestLoggingInterceptor : HandlerInterceptor {
         val requestId = UUID.randomUUID().toString().substring(0, 8)
         request.setAttribute("requestId", requestId)
 
-        val auth = SecurityContextHolder.getContext().authentication
-        val username =
-            if (auth != null && auth.isAuthenticated && auth !is AnonymousAuthenticationToken) {
-                auth.name
-            } else {
-                "(non-user)"
-            }
-
-        request.setAttribute("username", username)
-
-        val builder = StringBuilder("-> [REQUEST:  $requestId]\t\t\t\t= { ")
-
-        builder.append("from: \"$username\", ")
-        builder.append("method: \"${request.method}\", ")
-        builder.append("uri: \"${request.requestURI}\"")
-        builder.append(" }")
-
-        log.info(builder.toString())
+        log.info("-> [REQUEST:  $requestId] ${request.asLoggerString()}")
         return true
     }
 
@@ -55,7 +37,6 @@ class RequestLoggingInterceptor : HandlerInterceptor {
         val start = request.getAttribute("startTime") as Long
         val duration = System.currentTimeMillis() - start
 
-        val username = request.getAttribute("username") as String
         val requestId = request.getAttribute("requestId") as String
 
         val isUnhandledError = HttpStatus.valueOf(response.status).is5xxServerError
@@ -64,13 +45,76 @@ class RequestLoggingInterceptor : HandlerInterceptor {
             log.error("Unhandled exception occurred during request [$requestId]", ex)
         }
 
-        val builder = StringBuilder("<- [RESPONSE: $requestId] (${duration}ms)\t\t= { ")
+        val loggedResponse = response.asLoggerString(request.requestURI, duration)
 
-        builder.append("to: \"$username\", ")
-        builder.append("status: ${response.status}, ")
-        builder.append("uri: \"${request.requestURI}\"")
-        builder.append(" }")
+        log.info("<- [RESPONSE: $requestId] $loggedResponse")
+    }
 
-        log.info(builder.toString())
+    companion object {
+        /**
+         * Builds a stringified version of this request for logging.
+         *
+         * @return Stringified request information
+         */
+        private fun HttpServletRequest.asLoggerString(): String {
+            val builder = StringBuilder()
+
+            // Service
+            val serviceName = this.requestURI.removePrefix("/api/").substringBefore("/")
+            if (serviceName.isNotEmpty()) {
+                builder.appendSpaced("service=\"$serviceName\"")
+            } else {
+                builder.appendSpaced("service=null")
+            }
+
+            // HTTP method
+            builder.appendSpaced("method=\"${this.method}\"")
+
+            // URI template
+            val template =
+                this.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE) as? String
+
+            template?.let { builder.appendSpaced("route=\"$it\"") }
+
+            // URI
+            builder.appendSpaced("uri=\"${this.requestURI}\"")
+
+            return builder.toString()
+        }
+
+        /**
+         * Builds a stringified version of this response for logging.
+         *
+         * @param requestUri Request URI
+         * @param duration Time taken to complete
+         * @return Stringified response information
+         */
+        private fun HttpServletResponse.asLoggerString(
+            requestUri: String,
+            duration: Long,
+        ): String {
+            val builder = StringBuilder()
+
+            // Service
+            val serviceName = requestUri.removePrefix("/api/").substringBefore("/")
+            if (serviceName.isNotEmpty()) {
+                builder.appendSpaced("service=\"$serviceName\"")
+            } else {
+                builder.appendSpaced("service=null")
+            }
+
+            // Duration
+            builder.appendSpaced("duration=${duration}ms")
+
+            // HTTP status
+            val statusName = HttpStatus.valueOf(this.status).reasonPhrase
+            builder.appendSpaced("status=${this.status}")
+            builder.appendSpaced("statusName=\"$statusName\"")
+
+            return builder.toString()
+        }
+
+        /** Appends a string with a space at the end. */
+        private fun StringBuilder.appendSpaced(str: String) = this.append(str).append(" ")
     }
 }

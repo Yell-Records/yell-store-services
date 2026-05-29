@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 @Service
 class AuthService(
@@ -164,7 +166,7 @@ class AuthService(
                 username = user.username,
                 id = user.id!!,
                 role = user.role,
-                expirationMillis = INITIAL_SESSION_AGE_MS,
+                expirationMillis = accessTokenAge.inWholeMilliseconds,
             )
 
         return buildAccessCookie(accessToken)
@@ -176,21 +178,15 @@ class AuthService(
                 username = user.username,
                 id = user.id!!,
                 role = user.role,
-                expirationMillis = REFRESH_SESSION_AGE_MS,
+                expirationMillis = refreshTokenAge.inWholeMilliseconds,
             )
 
         return buildRefreshCookie(refreshToken)
     }
 
     companion object {
-        /** Initial session lifetime. Current value is 15 minutes. */
-        private const val INITIAL_SESSION_AGE_MS = 1000L * 60 * 15
-
-        /** Refreshed session lifetime. Current value is 30 days. */
-        private const val REFRESH_SESSION_AGE_MS = 1000L * 60 * 60 * 24 * 30
-
-        private const val INITIAL_SESSION_AGE_SECONDS = 1000L * 60 * 15 // 15 minutes
-        private const val REFRESH_SESSION_AGE_SECONDS = 1000L * 60 * 60 * 24 * 30 // 30 days
+        private val accessTokenAge = 15.minutes
+        private val refreshTokenAge = 30.days
 
         const val ACCESS_TOKEN_NAME = "access_token"
         const val REFRESH_TOKEN_NAME = "refresh_token"
@@ -208,7 +204,7 @@ class AuthService(
                 .secure(true)
                 .sameSite("Strict")
                 .path("/")
-                .maxAge(INITIAL_SESSION_AGE_SECONDS)
+                .maxAge(accessTokenAge.inWholeSeconds)
                 .build()
 
         /**
@@ -224,7 +220,7 @@ class AuthService(
                 .secure(true)
                 .sameSite("Strict")
                 .path("/api/auth/refresh")
-                .maxAge(REFRESH_SESSION_AGE_SECONDS) // 30 days
+                .maxAge(refreshTokenAge.inWholeSeconds)
                 .build()
 
         /** Builds a cookie which essentially "unauthorizes" current access token. */
