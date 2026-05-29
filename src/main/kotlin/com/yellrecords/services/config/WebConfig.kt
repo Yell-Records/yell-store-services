@@ -13,11 +13,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class WebConfig(
     private val interceptor: RequestLoggingInterceptor,
     private val imageConfig: ImageUploadProperties,
+    private val corsProps: CorsProps,
 ) : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
             .addMapping("/**")
-            .allowedOrigins("http://localhost:4200")
+            .allowedOriginPatterns(*corsProps.allowedOrigins.toTypedArray())
             .allowedMethods("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
     }
