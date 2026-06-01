@@ -65,7 +65,7 @@ class CartItemControllerTest : BaseH2Test() {
                     itemQuantity = 1,
                 )
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
+            mockRequest(requestType = POST, path = BASE_PATH, accessToken = null, body = req)
                 .andExpect(status().isOk)
 
             val guestItems = cartItemRepository.findGuestCartItems(guestId)
@@ -82,7 +82,7 @@ class CartItemControllerTest : BaseH2Test() {
                     itemQuantity = 1,
                 )
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
+            mockRequest(requestType = POST, path = BASE_PATH, accessToken = null, body = req)
                 .andExpect(status().isOk)
 
             val guestItems = cartItemRepository.findGuestCartItems(guestId)
@@ -101,8 +101,11 @@ class CartItemControllerTest : BaseH2Test() {
             val preItems = cartItemRepository.findGuestCartItems(guestId)
             preItems shouldHaveAtLeastSize 1
 
-            mockRequest(requestType = DELETE, path = "$BASE_PATH/guest/$guestId", token = null)
-                .andExpect(status().isNoContent)
+            mockRequest(
+                requestType = DELETE,
+                path = "$BASE_PATH/guest/$guestId",
+                accessToken = null,
+            ).andExpect(status().isNoContent)
 
             val guestItems = cartItemRepository.findGuestCartItems(guestId)
             guestItems shouldHaveSize 0
@@ -118,7 +121,7 @@ class CartItemControllerTest : BaseH2Test() {
                     itemQuantity = 1,
                 )
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = createReq)
+            mockRequest(requestType = POST, path = BASE_PATH, accessToken = null, body = createReq)
                 .andExpect(status().isOk)
 
             val preItems = cartItemRepository.findGuestCartItems(guestId)
@@ -128,7 +131,7 @@ class CartItemControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = DELETE,
                 path = "$BASE_PATH/guest/$guestId/listing/${listing2Dto.id}",
-                token = null,
+                accessToken = null,
             ).andExpect(status().isNoContent)
 
             val guestItems = cartItemRepository.findGuestCartItems(guestId)
@@ -141,7 +144,7 @@ class CartItemControllerTest : BaseH2Test() {
     inner class GetCartItems {
         @Test
         fun `should get items from guest cart`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/guest/$guestId", token = null)
+            mockRequest(requestType = GET, path = "$BASE_PATH/guest/$guestId", accessToken = null)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.length()").value(1))
         }

@@ -1,14 +1,13 @@
 package com.yellrecords.services.auth.filters
 
+import com.yellrecords.services.auth.AuthService
 import com.yellrecords.services.auth.CustomUserDetailsService
 import com.yellrecords.services.auth.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
@@ -22,33 +21,25 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        val authHeader = request.getHeader(HttpHeaders.AUTHORIZATION)
+        val accessToken =
+            request.cookies?.firstOrNull { it.name == AuthService.ACCESS_TOKEN_NAME }?.value
 
-        // If no authorization header or not bearer, just continue the chain
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response)
-            return
-        }
+        accessToken?.let { token ->
+            jwtService.extractUsername(token)?.let { username ->
+                val userDetails = userDetailsService.loadUserByUsername(username)
 
-        val jwt = authHeader.substring("Bearer ".length)
-        val username = jwtService.extractUsername(jwt)
+                val auth =
+                    UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
 
-        // Only authenticate if we have a username and no auth set yet
-        if (username != null && SecurityContextHolder.getContext().authentication == null) {
-            val customUserDetails = userDetailsService.loadUserByUsername(username)
-
-            // Check if the incoming JWT is valid first!
-            if (jwtService.validToken(jwt, customUserDetails)) {
-                val authToken =
-                    UsernamePasswordAuthenticationToken(
-                        customUserDetails,
-                        null,
-                        customUserDetails.authorities,
-                    )
-
-                authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-                SecurityContextHolder.getContext().authentication = authToken
+                SecurityContextHolder.getContext().authentication = auth
             }
+                ?: run {
+                    response.sendError(
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        "Invalid or expired token.",
+                    )
+                    return
+                }
         }
 
         filterChain.doFilter(request, response)

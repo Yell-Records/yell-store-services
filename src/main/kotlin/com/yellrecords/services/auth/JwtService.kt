@@ -15,7 +15,18 @@ class JwtService(
 ) {
     private val key = Keys.hmacShaKeyFor(secretKey.toByteArray())
 
-    fun extractUsername(token: String): String? = extractAllClaims(token).subject
+    /**
+     * Extracts the subject from a Java Web Token.
+     *
+     * @param token Java Web Token to extract from.
+     * @return Username in token, or null if the token is invalid or expired.
+     */
+    fun extractUsername(token: String): String? =
+        try {
+            extractAllClaims(token).subject
+        } catch (_: Exception) {
+            null // No username
+        }
 
     /**
      * Generates a Java Web Token string which expires in 24 hours.
@@ -23,14 +34,16 @@ class JwtService(
      * @param username Subject of the token
      * @param id The user's ID
      * @param role The user's role
+     * @param expirationMillis Expiration time in milliseconds
      */
     fun generateToken(
         username: String,
         id: UUID,
         role: String,
+        expirationMillis: Long,
     ): String {
         val now = Date()
-        val expiry = Date(now.time + 1000 * 60 * 60 * 24) // 24 hours
+        val expiry = Date(now.time + expirationMillis)
 
         return Jwts
             .builder()

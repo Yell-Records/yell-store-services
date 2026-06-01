@@ -12,6 +12,7 @@ HTML page data endpoints for music artists.
 ### Authentication
 Endpoints for login and endpoint authorization.
 - [Login](auth/auth-post-login.md): `POST /api/auth/login`
+- [Logout](auth/auth-post-logout.md): `POST /api/auth/logout`
 
 ### Cart Items
 Endpoints related to items within a client's cart.
@@ -42,7 +43,9 @@ Closed endpoints require a valid Token to be included in the header request, whi
 to administrator accounts.
 
 ### Authentication
+- [Get current session user details](auth/auth-get-me.md): `GET /api/auth/me`
 - [Change user password](auth/auth-patch-change-password.md): `PATCH /api/auth/user/:id/change-password`
+- [Refresh current session](auth/auth-post-refresh.md): `POST /api/auth/refresh`
 
 ### Artist Pages
 - [Create new artist page](artist-pages/artist-pages-post.md): `POST /api/artist-pages`

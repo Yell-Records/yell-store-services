@@ -1,5 +1,5 @@
 # Login User
-Validates user details and sends back a new Java Web Token associated with the user.
+Validates user details and attaches authenticated cookies to the response.
 
 **URL**: `/api/auth/login`
 
@@ -33,11 +33,14 @@ All fields must be present.
 **Code**: `200 OK`
 
 ### Content example
-Sends a Java Web Token to the application.
+Sends the authenticated user details back.
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-  "username": "admin"
+  "id": "3b5e9e1b-d7e8-47a2-825a-7a0ad0881c8a",
+  "username": "admin",
+  "email": "admin@yellrecords.com",
+  "createdAt": "2026-05-05T22:00:00Z",
+  "role": "ADMIN"
 }
 ```
 

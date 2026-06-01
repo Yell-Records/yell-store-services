@@ -45,7 +45,7 @@ class ItemListingControllerTest : BaseH2Test() {
     @Nested
     inner class CreateItemListing {
         @Test
-        fun `item listing created by non-user should return 403 forbidden`() {
+        fun `item listing created by non-user should return 401 unauthorized`() {
             val category =
                 categoryRepository.findCategoryBySlug("sample-category").shouldNotBeNull()
 
@@ -58,8 +58,8 @@ class ItemListingControllerTest : BaseH2Test() {
                     categorySlug = category.slug,
                 )
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
-                .andExpect(status().isForbidden)
+            mockRequest(requestType = POST, path = BASE_PATH, accessToken = null, body = req)
+                .andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -76,8 +76,12 @@ class ItemListingControllerTest : BaseH2Test() {
                     categorySlug = category.slug,
                 )
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = TestTokens.admin, body = req)
-                .andExpect(status().isCreated)
+            mockRequest(
+                requestType = POST,
+                path = BASE_PATH,
+                accessToken = TestAccessTokens.admin,
+                body = req,
+            ).andExpect(status().isCreated)
         }
     }
 
@@ -99,7 +103,7 @@ class ItemListingControllerTest : BaseH2Test() {
         @Test
         fun `should get only active item listings`() {
             val results =
-                mockRequest(requestType = GET, path = BASE_PATH, token = null)
+                mockRequest(requestType = GET, path = BASE_PATH, accessToken = null)
                     .andExpect(status().isOk)
                     .andReturn()
 
@@ -111,16 +115,19 @@ class ItemListingControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden when retrieving all item listings with no token`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/all", token = null)
-                .andExpect(status().isForbidden)
+        fun `should return 401 unauthorized when retrieving all item listings with no token`() {
+            mockRequest(requestType = GET, path = "$BASE_PATH/all", accessToken = null)
+                .andExpect(status().isUnauthorized)
         }
 
         @Test
         fun `should get every item listing`() {
             val results =
-                mockRequest(requestType = GET, path = "$BASE_PATH/all", token = TestTokens.admin)
-                    .andExpect(status().isOk)
+                mockRequest(
+                    requestType = GET,
+                    path = "$BASE_PATH/all",
+                    accessToken = TestAccessTokens.admin,
+                ).andExpect(status().isOk)
                     .andReturn()
 
             val body = results.response.contentAsString
@@ -136,7 +143,7 @@ class ItemListingControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = GET,
                     path = "$BASE_PATH/listing/${listing1.id}",
-                    token = null,
+                    accessToken = null,
                 ).andExpect(status().isOk)
                     .andReturn()
 
@@ -151,7 +158,7 @@ class ItemListingControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = GET,
                 path = "$BASE_PATH/listing/${UUID.randomUUID()}",
-                token = null,
+                accessToken = null,
             ).andExpect(status().isNotFound)
         }
 
@@ -188,7 +195,7 @@ class ItemListingControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = GET,
                         path = "$BASE_PATH/category/${sampleCategory.slug}",
-                        token = null,
+                        accessToken = null,
                     ).andExpect(status().isOk)
                         .andReturn()
 
@@ -206,7 +213,7 @@ class ItemListingControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = GET,
                     path = "$BASE_PATH/category/${sampleCategory.slug}",
-                    token = null,
+                    accessToken = null,
                 ).andExpect(status().isNotFound)
             }
         }
@@ -230,7 +237,7 @@ class ItemListingControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${listing1.id}",
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
                 body = req,
             ).andExpect(status().isOk)
 
@@ -243,13 +250,13 @@ class ItemListingControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden on unknown user changing listing details`() {
+        fun `should return 401 unauthorized on unknown user changing listing details`() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${listing1.id}",
-                token = null,
+                accessToken = null,
                 body = UpdateListingRequest(price = BigDecimal(0)),
-            ).andExpect(status().isForbidden)
+            ).andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -257,7 +264,7 @@ class ItemListingControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${listing1.id}",
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
                 body = UpdateListingRequest(price = BigDecimal(-1)),
             ).andExpect(status().isBadRequest)
         }
@@ -276,7 +283,7 @@ class ItemListingControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${listing1.id}",
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
                 body = UpdateListingRequest(isActive = false),
             ).andExpect(status().isOk)
 
