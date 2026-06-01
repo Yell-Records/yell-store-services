@@ -59,9 +59,9 @@ class CategoryControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden when retrieving every category as non-admin`() {
+        fun `should return 401 unauthorized when retrieving every category as non-admin`() {
             mockRequest(requestType = GET, path = "$BASE_PATH/all", token = null)
-                .andExpect(status().isForbidden)
+                .andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -82,11 +82,11 @@ class CategoryControllerTest : BaseH2Test() {
     @Nested
     inner class CreateCategory {
         @Test
-        fun `should return 403 forbidden when accessing as non-admin`() {
+        fun `should return 401 unauthorized when accessing as non-admin`() {
             val req = CreateCategoryDto(name = "Sample Category", slug = "category")
 
             mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
-                .andExpect(status().isForbidden)
+                .andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -191,7 +191,7 @@ class CategoryControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden for non-admins`() {
+        fun `should return 401 unauthorized for non-admins`() {
             val req =
                 PatchCategoryDto(name = "Best Category", slug = "super-category", isActive = true)
 
@@ -200,7 +200,7 @@ class CategoryControllerTest : BaseH2Test() {
                 path = "$BASE_PATH/${sampleCategory.id!!}",
                 token = null,
                 body = req,
-            ).andExpect(status().isForbidden)
+            ).andExpect(status().isUnauthorized)
         }
     }
 }

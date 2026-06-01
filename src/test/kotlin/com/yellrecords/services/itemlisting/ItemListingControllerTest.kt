@@ -45,7 +45,7 @@ class ItemListingControllerTest : BaseH2Test() {
     @Nested
     inner class CreateItemListing {
         @Test
-        fun `item listing created by non-user should return 403 forbidden`() {
+        fun `item listing created by non-user should return 401 unauthorized`() {
             val category =
                 categoryRepository.findCategoryBySlug("sample-category").shouldNotBeNull()
 
@@ -59,7 +59,7 @@ class ItemListingControllerTest : BaseH2Test() {
                 )
 
             mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
-                .andExpect(status().isForbidden)
+                .andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -111,9 +111,9 @@ class ItemListingControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden when retrieving all item listings with no token`() {
+        fun `should return 401 unauthorized when retrieving all item listings with no token`() {
             mockRequest(requestType = GET, path = "$BASE_PATH/all", token = null)
-                .andExpect(status().isForbidden)
+                .andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -243,13 +243,13 @@ class ItemListingControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden on unknown user changing listing details`() {
+        fun `should return 401 unauthorized on unknown user changing listing details`() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${listing1.id}",
                 token = null,
                 body = UpdateListingRequest(price = BigDecimal(0)),
-            ).andExpect(status().isForbidden)
+            ).andExpect(status().isUnauthorized)
         }
 
         @Test

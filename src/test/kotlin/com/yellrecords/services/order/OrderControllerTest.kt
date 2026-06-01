@@ -231,14 +231,14 @@ class OrderControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden when retrieving order by order number`() {
+        fun `should return 401 unauthorized when retrieving order by order number`() {
             val sampleOrder = orderRepository.findAll().first()
 
             mockRequest(
                 requestType = GET,
                 path = "$BASE_PATH/order-number/${sampleOrder.orderNumber}",
                 token = null,
-            ).andExpect(status().isForbidden)
+            ).andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -359,16 +359,16 @@ class OrderControllerTest : BaseH2Test() {
             @Nested
             inner class ForbiddenTests {
                 @Test
-                fun `confirm order should return 403 forbidden when not authenticated`() {
+                fun `confirm order should return 401 unauthorized when not authenticated`() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/confirm",
                         token = null,
-                    ).andExpect(status().isForbidden)
+                    ).andExpect(status().isUnauthorized)
                 }
 
                 @Test
-                fun `ship order should return 403 forbidden when not authenticated`() {
+                fun `ship order should return 401 unauthorized when not authenticated`() {
                     val req = TrackingDetailsDto(trackingNumber = "1Z999999999999")
 
                     mockRequest(
@@ -376,25 +376,25 @@ class OrderControllerTest : BaseH2Test() {
                         path = "$BASE_PATH/${guestOrder.id}/shipped",
                         token = null,
                         body = req,
-                    ).andExpect(status().isForbidden)
+                    ).andExpect(status().isUnauthorized)
                 }
 
                 @Test
-                fun `fulfill order should return 403 forbidden when not authenticated`() {
+                fun `fulfill order should return 401 unauthorized when not authenticated`() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/fulfill",
                         token = null,
-                    ).andExpect(status().isForbidden)
+                    ).andExpect(status().isUnauthorized)
                 }
 
                 @Test
-                fun `cancel order should return 403 forbidden when not authenticated`() {
+                fun `cancel order should return 401 unauthorized when not authenticated`() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/cancel",
                         token = null,
-                    ).andExpect(status().isForbidden)
+                    ).andExpect(status().isUnauthorized)
                 }
             }
 
@@ -542,12 +542,12 @@ class OrderControllerTest : BaseH2Test() {
         @Nested
         inner class AnonymizeOrder {
             @Test
-            fun `should return 403 forbidden when anonymizing without token`() {
+            fun `should return 401 unauthorized when anonymizing without token`() {
                 mockRequest(
                     requestType = PATCH,
                     path = "$BASE_PATH/${guestOrder.id}/anonymize",
                     token = null,
-                ).andExpect(status().isForbidden)
+                ).andExpect(status().isUnauthorized)
             }
 
             @Test

@@ -53,9 +53,9 @@ class ArtistPageControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden for unauthenticated request`() {
+        fun `should return 401 unauthorized for unauthenticated request`() {
             mockRequest(requestType = POST, path = BASE_PATH, token = null, body = createReq)
-                .andExpect(status().isForbidden)
+                .andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -185,7 +185,7 @@ class ArtistPageControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden on unauthenticated request`() {
+        fun `should return 401 unauthorized on unauthenticated request`() {
             val updateReq = UpdateArtistPageDto(slug = "vulgar-slug")
 
             mockRequest(
@@ -193,7 +193,7 @@ class ArtistPageControllerTest : BaseH2Test() {
                 path = "$BASE_PATH/${samplePage.id}",
                 token = null,
                 body = updateReq,
-            ).andExpect(status().isForbidden)
+            ).andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -241,9 +241,9 @@ class ArtistPageControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden on unauthenticated request`() {
+        fun `should return 401 unauthorized on unauthenticated request`() {
             mockRequest(requestType = DELETE, path = "$BASE_PATH/${samplePage.id}", token = null)
-                .andExpect(status().isForbidden)
+                .andExpect(status().isUnauthorized)
         }
 
         @Test

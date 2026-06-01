@@ -27,12 +27,12 @@ class UserControllerTest : BaseH2Test() {
         }
 
         @Test
-        fun `should return 403 forbidden when retrieving user information as non-user`() {
+        fun `should return 401 unauthorized when retrieving user information as non-user`() {
             mockRequest(
                 requestType = GET,
                 path = "$BASE_PATH/${TestUsers.admin.id!!}",
                 token = null,
-            ).andExpect(status().isForbidden)
+            ).andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -46,7 +46,7 @@ class UserControllerTest : BaseH2Test() {
     @Nested
     inner class UpdateUser {
         @Test
-        fun `should return 403 forbidden on mismatched token for updating email`() {
+        fun `should return 401 unauthorized on mismatched token for updating email`() {
             val req = UpdateEmailRequest(newEmail = "testbro@bademail.com")
 
             mockRequest(
@@ -54,7 +54,7 @@ class UserControllerTest : BaseH2Test() {
                 path = "$BASE_PATH/${TestUsers.admin.id!!}/email",
                 token = null,
                 body = req,
-            ).andExpect(status().isForbidden)
+            ).andExpect(status().isUnauthorized)
         }
 
         @Test

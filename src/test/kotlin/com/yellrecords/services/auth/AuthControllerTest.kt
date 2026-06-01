@@ -64,7 +64,7 @@ class AuthControllerTest : BaseH2Test() {
     @Nested
     inner class ChangePassword {
         @Test
-        fun `should return 403 forbidden on mismatched token when changing password`() {
+        fun `should return 401 unauthorized on mismatched token when changing password`() {
             val req =
                 ChangePasswordRequest(
                     rawCurrent = ADMIN_CORRECT_PASSWORD,
@@ -77,7 +77,7 @@ class AuthControllerTest : BaseH2Test() {
                 path = "$BASE_PATH/user/${TestUsers.admin.id}/change-password",
                 token = null,
                 body = req,
-            ).andExpect(status().isForbidden)
+            ).andExpect(status().isUnauthorized)
         }
 
         @Nested

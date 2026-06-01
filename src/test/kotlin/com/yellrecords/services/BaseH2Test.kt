@@ -1,5 +1,6 @@
 package com.yellrecords.services
 
+import com.yellrecords.services.auth.AuthService
 import com.yellrecords.services.auth.JwtService
 import com.yellrecords.services.category.Category
 import com.yellrecords.services.category.CategoryRepository
@@ -9,13 +10,13 @@ import com.yellrecords.services.itemlisting.ItemListingRepository
 import com.yellrecords.services.user.User
 import com.yellrecords.services.user.UserRepository
 import com.yellrecords.services.user.UserRole
+import jakarta.servlet.http.Cookie
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.context.annotation.Import
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -89,7 +90,13 @@ abstract class BaseH2Test {
                     ),
                 )
 
-            val token = jwtService.generateToken(seed.username, newUser.id!!, newUser.role)
+            val token =
+                jwtService.generateToken(
+                    username = seed.username,
+                    id = newUser.id!!,
+                    role = newUser.role,
+                    expirationMillis = 5000L,
+                )
 
             when (seed.role.uppercase()) {
                 UserRole.ADMIN -> {
@@ -175,7 +182,7 @@ abstract class BaseH2Test {
         }
 
         if (token != null) {
-            builder.header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+            builder.cookie(Cookie(AuthService.ACCESS_TOKEN_NAME, token))
         }
 
         params.forEach { (k, v) -> builder.param(k, v) }
