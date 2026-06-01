@@ -41,3 +41,6 @@ out/
 
 ### Image uploads ###
 /storage/uploads/
+
+### Environment variables ###
+.env
