@@ -22,7 +22,7 @@ class UserControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = GET,
                 path = "$BASE_PATH/${TestUsers.admin.id!!}",
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
             ).andExpect(status().isOk)
         }
 
@@ -31,14 +31,17 @@ class UserControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = GET,
                 path = "$BASE_PATH/${TestUsers.admin.id!!}",
-                token = null,
+                accessToken = null,
             ).andExpect(status().isUnauthorized)
         }
 
         @Test
         fun `should retrieve current user`() {
-            mockRequest(requestType = GET, path = "$BASE_PATH/me", token = TestTokens.admin)
-                .andExpect(status().isOk)
+            mockRequest(
+                requestType = GET,
+                path = "$BASE_PATH/me",
+                accessToken = TestAccessTokens.admin,
+            ).andExpect(status().isOk)
                 .andExpect(jsonPath("$.username").value(TestUsers.admin.username))
         }
     }
@@ -52,7 +55,7 @@ class UserControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${TestUsers.admin.id!!}/email",
-                token = null,
+                accessToken = null,
                 body = req,
             ).andExpect(status().isUnauthorized)
         }
@@ -64,7 +67,7 @@ class UserControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${TestUsers.admin.id!!}/email",
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
                 body = req,
             ).andExpect(status().isOk)
 

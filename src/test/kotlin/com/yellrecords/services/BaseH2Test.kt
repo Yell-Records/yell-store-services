@@ -64,7 +64,11 @@ abstract class BaseH2Test {
      *
      * @property admin Client with admin-level privilege.
      */
-    protected object TestTokens {
+    protected object TestAccessTokens {
+        lateinit var admin: String
+    }
+
+    protected object TestRefreshTokens {
         lateinit var admin: String
     }
 
@@ -90,7 +94,7 @@ abstract class BaseH2Test {
                     ),
                 )
 
-            val token =
+            val accessToken =
                 jwtService.generateToken(
                     username = seed.username,
                     id = newUser.id!!,
@@ -98,15 +102,25 @@ abstract class BaseH2Test {
                     expirationMillis = 5000L,
                 )
 
+            val refreshToken =
+                jwtService.generateToken(
+                    username = seed.username,
+                    id = newUser.id!!,
+                    role = newUser.role,
+                    expirationMillis = 10000L,
+                )
+
             when (seed.role.uppercase()) {
                 UserRole.ADMIN -> {
                     TestUsers.admin = newUser
-                    TestTokens.admin = token
+                    TestAccessTokens.admin = accessToken
+                    TestRefreshTokens.admin = refreshToken
                 }
 
                 else -> {
                     TestUsers.admin = newUser
-                    TestTokens.admin = token
+                    TestAccessTokens.admin = accessToken
+                    TestRefreshTokens.admin = refreshToken
                 }
             }
         }
@@ -152,14 +166,17 @@ abstract class BaseH2Test {
      *
      * @param requestType Method type of the controller.
      * @param path URI of the controller.
-     * @param token Which [TestTokens] to use for this call, or `null` if non-user.
+     * @param accessToken Which [TestAccessTokens] to use for this call, or `null` if non-user.
+     * @param refreshToken Which [TestAccessTokens] to use for the refresh token, or `null` if
+     *   non-user.
      * @param body Data body in the request for `POST` calls.
      * @param params Parameters to add to the request.
      */
     protected fun mockRequest(
         requestType: HttpMethod,
         path: String,
-        token: String?,
+        accessToken: String?,
+        refreshToken: String? = null,
         body: Any? = null,
         params: Map<String, String> = emptyMap(),
     ): ResultActions {
@@ -181,8 +198,12 @@ abstract class BaseH2Test {
                 .content(objectMapper.writeValueAsString(body))
         }
 
-        if (token != null) {
-            builder.cookie(Cookie(AuthService.ACCESS_TOKEN_NAME, token))
+        if (accessToken != null) {
+            builder.cookie(Cookie(AuthService.ACCESS_TOKEN_NAME, accessToken))
+        }
+
+        if (refreshToken != null) {
+            builder.cookie(Cookie(AuthService.REFRESH_TOKEN_NAME, refreshToken))
         }
 
         params.forEach { (k, v) -> builder.param(k, v) }

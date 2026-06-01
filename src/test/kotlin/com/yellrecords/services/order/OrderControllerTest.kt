@@ -102,7 +102,7 @@ class OrderControllerTest : BaseH2Test() {
         fun `should create order for non-user`() {
             val req = genCreateOrder()
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
+            mockRequest(requestType = POST, path = BASE_PATH, accessToken = null, body = req)
                 .andExpect(status().isCreated)
         }
 
@@ -113,7 +113,7 @@ class OrderControllerTest : BaseH2Test() {
             invalidValues.forEach { value ->
                 val req = genCreateOrder(totalPaid = value)
 
-                mockRequest(requestType = POST, path = BASE_PATH, token = null, body = req)
+                mockRequest(requestType = POST, path = BASE_PATH, accessToken = null, body = req)
                     .andExpect(status().isBadRequest)
             }
         }
@@ -122,8 +122,12 @@ class OrderControllerTest : BaseH2Test() {
         fun `should create order items based on items in cart`() {
             val guestRequest = genCreateOrder(totalPaid = BigDecimal("300.0"))
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = guestRequest)
-                .andExpect(status().isCreated)
+            mockRequest(
+                requestType = POST,
+                path = BASE_PATH,
+                accessToken = null,
+                body = guestRequest,
+            ).andExpect(status().isCreated)
 
             val allOrders = orderRepository.findAll().toList()
             allOrders shouldHaveSize 1
@@ -188,7 +192,7 @@ class OrderControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = GET,
                     path = BASE_PATH,
-                    token = TestTokens.admin,
+                    accessToken = TestAccessTokens.admin,
                     params = mapOf("unfinished" to "true"),
                 ).andExpect(status().isOk)
                     .andReturn()
@@ -218,7 +222,7 @@ class OrderControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = GET,
                     path = BASE_PATH,
-                    token = TestTokens.admin,
+                    accessToken = TestAccessTokens.admin,
                     params = mapOf("unfinished" to "false"),
                 ).andExpect(status().isOk)
                     .andReturn()
@@ -237,7 +241,7 @@ class OrderControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = GET,
                 path = "$BASE_PATH/order-number/${sampleOrder.orderNumber}",
-                token = null,
+                accessToken = null,
             ).andExpect(status().isUnauthorized)
         }
 
@@ -249,7 +253,7 @@ class OrderControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = GET,
                     path = "$BASE_PATH/order-number/${sampleOrder.orderNumber}",
-                    token = TestTokens.admin,
+                    accessToken = TestAccessTokens.admin,
                 ).andExpect(status().isOk)
                     .andReturn()
 
@@ -267,7 +271,7 @@ class OrderControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = GET,
                     path = "$BASE_PATH/${sampleOrder.id}",
-                    token = TestTokens.admin,
+                    accessToken = TestAccessTokens.admin,
                 ).andExpect(status().isOk)
                     .andReturn()
 
@@ -299,7 +303,7 @@ class OrderControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${guestOrder.id}",
-                token = null,
+                accessToken = null,
                 body = req,
             ).andExpect(status().isForbidden)
         }
@@ -315,7 +319,7 @@ class OrderControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${guestOrder.id}",
-                token = null,
+                accessToken = null,
                 body = req,
             ).andExpect(status().isForbidden)
         }
@@ -332,7 +336,7 @@ class OrderControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${guestOrder.id}",
-                token = null,
+                accessToken = null,
                 body = req,
             ).andExpect(status().isOk)
 
@@ -363,7 +367,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/confirm",
-                        token = null,
+                        accessToken = null,
                     ).andExpect(status().isUnauthorized)
                 }
 
@@ -374,7 +378,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/shipped",
-                        token = null,
+                        accessToken = null,
                         body = req,
                     ).andExpect(status().isUnauthorized)
                 }
@@ -384,7 +388,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/fulfill",
-                        token = null,
+                        accessToken = null,
                     ).andExpect(status().isUnauthorized)
                 }
 
@@ -393,7 +397,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/cancel",
-                        token = null,
+                        accessToken = null,
                     ).andExpect(status().isUnauthorized)
                 }
             }
@@ -409,7 +413,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/confirm",
-                        token = TestTokens.admin,
+                        accessToken = TestAccessTokens.admin,
                     ).andExpect(status().isConflict)
                 }
 
@@ -420,7 +424,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/confirm",
-                        token = TestTokens.admin,
+                        accessToken = TestAccessTokens.admin,
                     ).andExpect(status().isOk)
 
                     val updatedOrder = orderRepository.findById(guestOrder.id!!).get()
@@ -439,7 +443,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/shipped",
-                        token = TestTokens.admin,
+                        accessToken = TestAccessTokens.admin,
                         body = sampleReq,
                     ).andExpect(status().isConflict)
                 }
@@ -452,7 +456,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/shipped",
-                        token = TestTokens.admin,
+                        accessToken = TestAccessTokens.admin,
                         body = sampleReq,
                     ).andExpect(status().isOk)
 
@@ -472,7 +476,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/fulfill",
-                        token = TestTokens.admin,
+                        accessToken = TestAccessTokens.admin,
                     ).andExpect(status().isConflict)
                 }
 
@@ -485,7 +489,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/fulfill",
-                        token = TestTokens.admin,
+                        accessToken = TestAccessTokens.admin,
                     ).andExpect(status().isOk)
 
                     val updatedOrder = orderRepository.findById(guestOrder.id!!).get()
@@ -507,7 +511,7 @@ class OrderControllerTest : BaseH2Test() {
                         mockRequest(
                             requestType = PATCH,
                             path = "$BASE_PATH/${guestOrder.id}/cancel",
-                            token = TestTokens.admin,
+                            accessToken = TestAccessTokens.admin,
                         ).andExpect(status().isConflict)
                     }
                 }
@@ -528,7 +532,7 @@ class OrderControllerTest : BaseH2Test() {
                         mockRequest(
                             requestType = PATCH,
                             path = "$BASE_PATH/${guestOrder.id}/cancel",
-                            token = TestTokens.admin,
+                            accessToken = TestAccessTokens.admin,
                         ).andExpect(status().isOk)
 
                         val updatedOrder = orderRepository.findById(guestOrder.id!!).get()
@@ -546,7 +550,7 @@ class OrderControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = PATCH,
                     path = "$BASE_PATH/${guestOrder.id}/anonymize",
-                    token = null,
+                    accessToken = null,
                 ).andExpect(status().isUnauthorized)
             }
 
@@ -559,7 +563,7 @@ class OrderControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = PATCH,
                     path = "$BASE_PATH/${guestOrder.id}/anonymize",
-                    token = TestTokens.admin,
+                    accessToken = TestAccessTokens.admin,
                 ).andExpect(status().isConflict)
             }
 
@@ -573,7 +577,7 @@ class OrderControllerTest : BaseH2Test() {
                     mockRequest(
                         requestType = PATCH,
                         path = "$BASE_PATH/${guestOrder.id}/anonymize",
-                        token = TestTokens.admin,
+                        accessToken = TestAccessTokens.admin,
                     ).andExpect(status().isOk)
                         .andReturn()
 
@@ -598,7 +602,7 @@ class OrderControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = PATCH,
                     path = "$BASE_PATH/${guestOrder.id}/anonymize",
-                    token = TestTokens.admin,
+                    accessToken = TestAccessTokens.admin,
                 ).andExpect(status().isNoContent)
             }
         }

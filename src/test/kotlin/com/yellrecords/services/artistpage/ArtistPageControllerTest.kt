@@ -54,7 +54,7 @@ class ArtistPageControllerTest : BaseH2Test() {
 
         @Test
         fun `should return 401 unauthorized for unauthenticated request`() {
-            mockRequest(requestType = POST, path = BASE_PATH, token = null, body = createReq)
+            mockRequest(requestType = POST, path = BASE_PATH, accessToken = null, body = createReq)
                 .andExpect(status().isUnauthorized)
         }
 
@@ -65,7 +65,7 @@ class ArtistPageControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = POST,
                 path = BASE_PATH,
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
                 body = createReq,
             ).andExpect(status().isCreated)
 
@@ -77,8 +77,12 @@ class ArtistPageControllerTest : BaseH2Test() {
         fun `should return 400 bad request on invalid slug`() {
             val req = createReq.copy(slug = "INVALID SLUG !!!")
 
-            mockRequest(requestType = POST, path = BASE_PATH, token = TestTokens.admin, body = req)
-                .andExpect(status().isBadRequest)
+            mockRequest(
+                requestType = POST,
+                path = BASE_PATH,
+                accessToken = TestAccessTokens.admin,
+                body = req,
+            ).andExpect(status().isBadRequest)
         }
 
         @Test
@@ -96,7 +100,7 @@ class ArtistPageControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = POST,
                 path = BASE_PATH,
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
                 body = createReq,
             ).andExpect(status().isConflict)
         }
@@ -132,7 +136,7 @@ class ArtistPageControllerTest : BaseH2Test() {
         @Test
         fun `should get all artist pages`() {
             val result =
-                mockRequest(requestType = GET, path = BASE_PATH, token = null)
+                mockRequest(requestType = GET, path = BASE_PATH, accessToken = null)
                     .andExpect(status().isOk)
                     .andReturn()
 
@@ -148,7 +152,7 @@ class ArtistPageControllerTest : BaseH2Test() {
                 mockRequest(
                     requestType = GET,
                     path = "$BASE_PATH/slug/${sampleArtist1.slug}",
-                    token = null,
+                    accessToken = null,
                 ).andExpect(status().isOk)
                     .andReturn()
 
@@ -162,7 +166,7 @@ class ArtistPageControllerTest : BaseH2Test() {
         fun `should return 404 not found on non-existent slug`() {
             val badSlug = "non-existent-slug"
 
-            mockRequest(requestType = GET, path = "$BASE_PATH/slug/$badSlug", token = null)
+            mockRequest(requestType = GET, path = "$BASE_PATH/slug/$badSlug", accessToken = null)
                 .andExpect(status().isNotFound)
         }
     }
@@ -191,7 +195,7 @@ class ArtistPageControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${samplePage.id}",
-                token = null,
+                accessToken = null,
                 body = updateReq,
             ).andExpect(status().isUnauthorized)
         }
@@ -204,7 +208,7 @@ class ArtistPageControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${samplePage.id}",
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
                 body = updateReq,
             ).andExpect(status().isOk)
 
@@ -217,7 +221,7 @@ class ArtistPageControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = PATCH,
                 path = "$BASE_PATH/${samplePage.id}",
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
                 body = UpdateArtistPageDto(),
             ).andExpect(status().isNoContent)
         }
@@ -242,8 +246,11 @@ class ArtistPageControllerTest : BaseH2Test() {
 
         @Test
         fun `should return 401 unauthorized on unauthenticated request`() {
-            mockRequest(requestType = DELETE, path = "$BASE_PATH/${samplePage.id}", token = null)
-                .andExpect(status().isUnauthorized)
+            mockRequest(
+                requestType = DELETE,
+                path = "$BASE_PATH/${samplePage.id}",
+                accessToken = null,
+            ).andExpect(status().isUnauthorized)
         }
 
         @Test
@@ -253,7 +260,7 @@ class ArtistPageControllerTest : BaseH2Test() {
             mockRequest(
                 requestType = DELETE,
                 path = "$BASE_PATH/${samplePage.id}",
-                token = TestTokens.admin,
+                accessToken = TestAccessTokens.admin,
             ).andExpect(status().isNoContent)
 
             artistPageRepository.findArtistPageBySlug(samplePage.slug).shouldBeNull()
