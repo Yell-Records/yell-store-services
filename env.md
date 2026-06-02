@@ -22,7 +22,6 @@ Default profile.
 - `IMAGE_BUCKET`
   - Blank default
   - Not needed if `IMAGE_PROVIDER=LOCAL`
-  - Currently not used, but will be used for S3 purposes
 - `IMAGE_BASE_URL`
   - Default `http://localhost:8080`
   - URL where images are hosted
@@ -43,9 +42,7 @@ Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 - `DB_USERNAME` - Production account username for database
 - `DB_PASSWORD` - Production account password for database
 - `IMAGE_BASE_URL` - URL where images are hosted
-- `IMAGE_BUCKET` - _TODO: S3_
-- `IMAGE_PROVIDER` - Should be set to S3, but can be set to LOCAL if needed (not recommended)
-- `IMAGE_UPLOAD_DIR` - Directory for image uploads
+- `IMAGE_BUCKET` - S3 bucket name where images are hosted
 - `JWT_SECRET` - 256-bit encryption secret for generating Java Web Tokens
 - `MAIL_HOST` - URI of email server
 - `MAIL_PORT` - SMTP port of email server

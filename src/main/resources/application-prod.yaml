@@ -31,8 +31,8 @@ spring:
             enable: false
 
 images:
-  provider: ${IMAGE_PROVIDER}
-  upload-dir: ${IMAGE_UPLOAD_DIR}
+  provider: S3
+  upload-dir: /
   bucket: ${IMAGE_BUCKET}
   base-url: ${IMAGE_BASE_URL}
 
