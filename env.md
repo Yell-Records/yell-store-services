@@ -32,6 +32,16 @@ Default profile.
 - `POLICIES_PATH`
   - Default: _storage/policies_
   - Filepath to where policy files are stored
+  - Not needed if `POLICIES_PROVIDER=S3`
+- `POLICIES_PROVIDER`
+  - Default: LOCAL
+  - Can change to S3 for AWS connection
+- `POLICIES_BUCKET`
+  - Not needed if `POLICIES_PROVIDER=LOCAL`
+  - S3 bucket name where policies are stored
+- `POLICIES_BASE_URL`
+  - Not needed if `POLICIES_PROVIDER=LOCAL`
+  - URL in AWS where policies are stored
 
 ## Production (prod)
 Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
@@ -50,7 +60,8 @@ Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 - `MAIL_PASSWORD` - Mail server password for user
 - `PAYPAL_CLIENT_ID` - Client ID for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
 - `PAYPAL_CLIENT_SECRET` - Client secret for PayPal purchases.<sup>[How do I get this?](docs/paypal-setup.md)</sup>
-- `POLICIES_PATH` - Filepath to where policies are stored
+- `POLICIES_BUCKET` - S3 bucket name where policies are stored
+- `POLICIES_BASE_URL` - URL in AWS where policies are located
 
 ### Optional
 

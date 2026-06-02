@@ -42,7 +42,10 @@ paypal:
   mode: live
 
 policies:
-  path: ${POLICIES_PATH}
+  path: /
+  provider: S3
+  bucket: ${POLICIES_BUCKET}
+  base-url: ${POLICIES_BASE_URL}
 
 jobs:
   stale-order-cleanup:
