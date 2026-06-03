@@ -38,6 +38,9 @@ images:
 
 policies:
   path: ${POLICIES_PATH:storage/policies}
+  provider: ${POLICIES_PROVIDER:LOCAL}
+  bucket: ${POLICIES_BUCKET:}
+  base-url: ${POLICIES_BASE_URL:}
 
 paypal:
   client-id: ${PAYPAL_CLIENT_ID}
