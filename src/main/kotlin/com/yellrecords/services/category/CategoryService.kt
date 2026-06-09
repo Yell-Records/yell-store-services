@@ -4,9 +4,9 @@ import com.yellrecords.services.category.dto.CategoryDto
 import com.yellrecords.services.category.dto.CreateCategoryDto
 import com.yellrecords.services.category.dto.PatchCategoryDto
 import com.yellrecords.services.category.mapper.CategoryMapper
-import com.yellrecords.services.exception.BadRequestException
-import com.yellrecords.services.exception.ForbiddenException
-import com.yellrecords.services.exception.NotFoundException
+import com.yellrecords.services.exception.domain.BadRequestException
+import com.yellrecords.services.exception.domain.ForbiddenException
+import com.yellrecords.services.exception.domain.NotFoundException
 import com.yellrecords.services.util.SLUG_REGEX
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service

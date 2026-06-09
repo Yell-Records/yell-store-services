@@ -5,9 +5,9 @@ import com.yellrecords.services.artistpage.dto.CreateArtistPageDto
 import com.yellrecords.services.artistpage.dto.UpdateArtistPageDto
 import com.yellrecords.services.artistpage.mapper.ArtistPageMapper
 import com.yellrecords.services.category.CategoryRepository
-import com.yellrecords.services.exception.BadRequestException
-import com.yellrecords.services.exception.ConflictException
-import com.yellrecords.services.exception.NotFoundException
+import com.yellrecords.services.exception.domain.BadRequestException
+import com.yellrecords.services.exception.domain.ConflictException
+import com.yellrecords.services.exception.domain.NotFoundException
 import com.yellrecords.services.util.HtmlUtil
 import com.yellrecords.services.util.SLUG_REGEX
 import org.springframework.http.HttpStatus

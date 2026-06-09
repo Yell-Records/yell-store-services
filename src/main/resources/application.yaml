@@ -10,6 +10,10 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  web:
+    error:
+      include-message: always
+
   jpa:
     show-sql: false
 
@@ -28,9 +32,12 @@ logging:
   level:
     root: INFO
     org:
-      hibernate:
-        orm:
-          connections:
-            # Disables showing database information on startup
-            pooling: WARN
-
+      # Disables showing database information on startup
+      hibernate.orm.connections.pooling: WARN
+      # Prevent logger noise on malformed HTTP requests
+      apache:
+        catalina.connector.CoyoteAdapter: ERROR
+        coyote.http11:
+          Http11InputBuffer: ERROR
+          Http11Processor: ERROR
+        tomcat.util.http.parser.HttpParser: ERROR

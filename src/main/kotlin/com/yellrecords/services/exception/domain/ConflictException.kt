@@ -1,4 +1,4 @@
-package com.yellrecords.services.exception
+package com.yellrecords.services.exception.domain
 
 /**
  * Exception for attempts to save an entity which already exists.
