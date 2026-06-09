@@ -6,6 +6,7 @@ import com.yellrecords.services.exception.domain.ForbiddenException
 import com.yellrecords.services.exception.domain.NotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
+import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.web.ErrorResponse
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -51,6 +52,9 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException::class)
     fun handleNoResourceFound(): ErrorResponse = SimpleErrorResponse(HttpStatus.NOT_FOUND, "Not Found")
+
+    @ExceptionHandler(AuthorizationDeniedException::class)
+    fun handleAuthorizationDenied(): ErrorResponse = SimpleErrorResponse(HttpStatus.UNAUTHORIZED, "Access Denied")
 
     @ExceptionHandler(Exception::class)
     fun handleUnhandled(): ErrorResponse = SimpleErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error")
