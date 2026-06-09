@@ -1,4 +1,4 @@
-package com.yellrecords.services.exception
+package com.yellrecords.services.exception.domain
 
 /**
  * Exception which is thrown when data contains an invalid value, like quantity being below 1.

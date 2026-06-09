@@ -1,7 +1,7 @@
 package com.yellrecords.services.user
 
-import com.yellrecords.services.exception.BadRequestException
-import com.yellrecords.services.exception.NotFoundException
+import com.yellrecords.services.exception.domain.BadRequestException
+import com.yellrecords.services.exception.domain.NotFoundException
 import com.yellrecords.services.user.dto.UpdateEmailRequest
 import com.yellrecords.services.user.dto.UserDto
 import com.yellrecords.services.user.mapper.UserMapper

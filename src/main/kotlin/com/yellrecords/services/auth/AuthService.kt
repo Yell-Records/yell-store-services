@@ -2,9 +2,9 @@ package com.yellrecords.services.auth
 
 import com.yellrecords.services.auth.dto.ChangePasswordRequest
 import com.yellrecords.services.auth.dto.LoginRequest
-import com.yellrecords.services.exception.BadRequestException
-import com.yellrecords.services.exception.ForbiddenException
-import com.yellrecords.services.exception.NotFoundException
+import com.yellrecords.services.exception.domain.BadRequestException
+import com.yellrecords.services.exception.domain.ForbiddenException
+import com.yellrecords.services.exception.domain.NotFoundException
 import com.yellrecords.services.user.User
 import com.yellrecords.services.user.UserRepository
 import com.yellrecords.services.user.dto.UserDto

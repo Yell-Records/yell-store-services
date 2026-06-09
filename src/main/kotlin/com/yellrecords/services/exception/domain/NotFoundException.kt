@@ -1,4 +1,4 @@
-package com.yellrecords.services.exception
+package com.yellrecords.services.exception.domain
 
 /**
  * Exception which is thrown when attempting to retrieve an unknown entity that should be

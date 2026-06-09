@@ -1,4 +1,4 @@
-package com.yellrecords.services.exception
+package com.yellrecords.services.exception.domain
 
 /**
  * Exception which is thrown when logic fails to pass checks like business rules.

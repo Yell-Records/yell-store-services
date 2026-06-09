@@ -3,7 +3,7 @@ package com.yellrecords.services.cart
 import com.yellrecords.services.cart.dto.AddCartItemDto
 import com.yellrecords.services.cart.dto.CartItemWithListingDto
 import com.yellrecords.services.category.CategoryRepository
-import com.yellrecords.services.exception.BadRequestException
+import com.yellrecords.services.exception.domain.BadRequestException
 import com.yellrecords.services.itemlisting.ItemListingRepository
 import com.yellrecords.services.itemlisting.dto.ItemListingMapper
 import org.springframework.stereotype.Service

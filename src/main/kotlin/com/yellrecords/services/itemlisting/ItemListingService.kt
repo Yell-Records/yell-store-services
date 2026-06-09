@@ -2,8 +2,8 @@ package com.yellrecords.services.itemlisting
 
 import com.yellrecords.services.cart.CartItemRepository
 import com.yellrecords.services.category.CategoryRepository
-import com.yellrecords.services.exception.BadRequestException
-import com.yellrecords.services.exception.NotFoundException
+import com.yellrecords.services.exception.domain.BadRequestException
+import com.yellrecords.services.exception.domain.NotFoundException
 import com.yellrecords.services.itemlisting.dto.CreateListingRequest
 import com.yellrecords.services.itemlisting.dto.ItemListingDto
 import com.yellrecords.services.itemlisting.dto.ItemListingMapper
