@@ -64,10 +64,11 @@ class SecurityConfig {
         http: HttpSecurity,
         jwtAuthenticationFilter: JwtAuthenticationFilter,
         authenticationProvider: AuthenticationProvider,
+        corsProps: CorsProps,
     ): SecurityFilterChain {
         http
             .csrf { it.disable() } // CSRF is not needed for stateless APIs (which is JWT)
-            .cors {}
+            .cors { it.configurationSource(corsConfigurationSource(corsProps)) }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth -> auth.anyRequest().permitAll() }
             .authenticationProvider(authenticationProvider)

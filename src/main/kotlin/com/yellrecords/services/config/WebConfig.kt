@@ -21,6 +21,7 @@ class WebConfig(
             .allowedOriginPatterns(*corsProps.allowedOrigins.toTypedArray())
             .allowedMethods("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
+            .allowCredentials(true)
     }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
