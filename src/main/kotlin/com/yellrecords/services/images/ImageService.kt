@@ -50,7 +50,6 @@ class ImageService(
                 .bucket(imageConfig.bucket)
                 .key(filename)
                 .contentType(file.contentType)
-                .acl("public-read")
                 .build()
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.bytes))
