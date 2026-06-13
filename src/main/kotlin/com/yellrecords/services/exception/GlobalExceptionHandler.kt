@@ -5,6 +5,7 @@ import com.yellrecords.services.exception.domain.ConflictException
 import com.yellrecords.services.exception.domain.ForbiddenException
 import com.yellrecords.services.exception.domain.NotFoundException
 import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.web.ErrorResponse
@@ -14,6 +15,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @ControllerAdvice
 class GlobalExceptionHandler {
+    private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
     @ExceptionHandler(NotFoundException::class)
     fun handleNotFound(
         ex: NotFoundException,
@@ -57,5 +60,9 @@ class GlobalExceptionHandler {
     fun handleAuthorizationDenied(): ErrorResponse = SimpleErrorResponse(HttpStatus.UNAUTHORIZED, "Access Denied")
 
     @ExceptionHandler(Exception::class)
-    fun handleUnhandled(): ErrorResponse = SimpleErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error")
+    fun handleUnhandled(ex: Exception): ErrorResponse {
+        logger.error("Internal Server Error occurred", ex)
+
+        return SimpleErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error")
+    }
 }

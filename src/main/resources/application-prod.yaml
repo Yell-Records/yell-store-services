@@ -31,9 +31,9 @@ spring:
     password: ${MAIL_PASSWORD}
     properties:
       mail.smtp:
-          auth: false
+          auth: true
           starttls:
-            enable: false
+            enable: true
 
 images:
   provider: S3
@@ -44,7 +44,7 @@ images:
 paypal:
   client-id: ${PAYPAL_CLIENT_ID}
   client-secret: ${PAYPAL_CLIENT_SECRET}
-  mode: live
+  mode: ${PAYPAL_MODE}
 
 policies:
   path: /
