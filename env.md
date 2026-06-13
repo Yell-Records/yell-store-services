@@ -16,9 +16,6 @@ Default profile.
   - Default: LOCAL
   - Accepted values: LOCAL, S3
   - Determines how images are provided and exposed
-- `IMAGE_UPLOAD_DIR`
-  - Default: uploads
-  - Path where images are stored
 - `IMAGE_BUCKET`
   - Blank default
   - Not needed if `IMAGE_PROVIDER=LOCAL`
@@ -64,6 +61,10 @@ Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 - `POLICIES_BASE_URL` - URL in AWS where policies are located
 
 ### Optional
+- `LOG_LEVEL`
+  - Default: INFO
+  - Level of logging to output
+  - Can be changed to _DEBUG_ to output logs for incoming requests and outgoing responses
 
 #### Stale order cleanup job
 This scheduled job purges order entities in a "stale" state. A stale order is in status _AWAITING_PAYMENT_ and 

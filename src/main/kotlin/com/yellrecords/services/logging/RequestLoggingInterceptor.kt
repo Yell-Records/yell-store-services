@@ -29,7 +29,9 @@ class RequestLoggingInterceptor : HandlerInterceptor {
         request.setAttribute(ATTR_REQUEST_ID, requestId)
 
         if (request.isToKnownService()) {
-            logger.info("-> [REQUEST:  $requestId] ${request.asInfoLog()}")
+            logger.debug("-> [REQUEST:  $requestId] ${request.asInfoLog()}")
+        } else if (request.isReadingDevImage()) {
+            logger.debug("(Reading local image) ${request.requestURI}")
         } else {
             logger.warn("-> [REQUEST:  $requestId] ${request.asWarnUnknownLog()}")
         }
@@ -54,8 +56,11 @@ class RequestLoggingInterceptor : HandlerInterceptor {
             logger.error("Unhandled exception occurred during request [$requestId]", ex)
         }
 
-        val loggedResponse = response.asInfoLog(request, duration)
+        // Log the response as DEBUG if it's not returning local image data
+        if (!request.isReadingDevImage()) {
+            val loggedResponse = response.asInfoLog(request, duration)
 
-        logger.info("<- [RESPONSE: $requestId] $loggedResponse")
+            logger.debug("<- [RESPONSE: $requestId] $loggedResponse")
+        }
     }
 }

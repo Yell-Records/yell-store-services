@@ -32,7 +32,7 @@ spring:
 
 images:
   provider: ${IMAGE_PROVIDER:LOCAL}
-  upload-dir: ${IMAGE_UPLOAD_DIR:storage/uploads}
+  upload-dir: storage/uploads
   bucket: ${IMAGE_BUCKET:}
   base-url: "${IMAGE_BASE_URL:http://localhost:8080}"
 
@@ -63,3 +63,7 @@ jwt:
 cors:
   allowed-origins:
     - http://localhost:4200
+
+logging:
+  level:
+    com.yellrecords.services: DEBUG

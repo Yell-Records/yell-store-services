@@ -77,6 +77,14 @@ fun HttpServletRequest.asWarnUnknownLog(): String {
 /** Checks if the destination on this request is to a valid endpoint service. */
 fun HttpServletRequest.isToKnownService(): Boolean = extractServiceName(this.requestURI) != null
 
+/** Checks if this request is reading a local image in a DEV environment. */
+fun HttpServletRequest.isReadingDevImage(): Boolean {
+    val env = System.getenv("SPRING_PROFILES_ACTIVE").orEmpty()
+    val isDevEnv = env.isEmpty() || env == "dev"
+
+    return isDevEnv && this.requestURI.contains("uploads")
+}
+
 /**
  * Builds a stringified version of this response for logging. If the service name is unrecognized,
  * returns null.
