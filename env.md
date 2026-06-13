@@ -62,7 +62,7 @@ Profile for public use, or when `SPRING_PROFILES_ACTIVE=prod`.
 
 ### Optional
 - `LOG_LEVEL`
-  - Default: INFO
+  - Default: _INFO_
   - Level of logging to output
   - Can be changed to _DEBUG_ to output logs for incoming requests and outgoing responses
 
